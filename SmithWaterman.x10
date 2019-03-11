@@ -21,8 +21,8 @@ public class SmithWaterman {
   }
 
   def print() {
-    for (i in 1..N+1) {
-      for (j in 1..M+1) {
+    for (i in 0..N) {
+      for (j in 0..M) {
         Console.OUT.printf("%1.4f ", H(i, j));
       }
       Console.OUT.println();
