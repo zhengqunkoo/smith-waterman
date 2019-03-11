@@ -1,5 +1,6 @@
 import x10.io.Console;
 import x10.array.Array_2;
+import x10.io.File;
 
 public class SmithWaterman {
   val N:Long; // Length of A
@@ -30,6 +31,20 @@ public class SmithWaterman {
   }
 
   public static def main(args:Rail[String]):void {
+    if (args.size != 1) {
+      Console.OUT.println("Usage: SmithWaterman filename");
+      return;
+    }
+
+    val file = new File(args(0));
+    val fr = file.openRead();
+    for (i in 1..35) {
+      fr.readLine();
+    }
+    for (line in fr.lines()) {
+      Console.OUT.println(fr.readLine());
+    }
+
     val sw = new SmithWaterman();
     sw.print();
   }
