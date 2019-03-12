@@ -44,6 +44,7 @@ public class SmithWaterman {
     for (line in fr.lines()) {
       Console.OUT.println(line);
     }
+    fr.close();
 
     val sw = new SmithWaterman();
     sw.print();
