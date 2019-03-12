@@ -21,7 +21,7 @@ public class SmithWaterman {
     }
   }
 
-  def print() {
+  def printH() {
     for (i in 0..N) {
       for (j in 0..M) {
         Console.OUT.printf("%1.4f ", H(i, j));
@@ -48,10 +48,9 @@ public class SmithWaterman {
       }
       Console.OUT.print(char);
     }
+    val sw = new SmithWaterman();
+    sw.printH();
 
     fr.close();
-
-    val sw = new SmithWaterman();
-    sw.print();
   }
 }
