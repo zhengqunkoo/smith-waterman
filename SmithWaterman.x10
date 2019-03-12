@@ -42,11 +42,11 @@ public class SmithWaterman {
       fr.readLine();
     }
 
-    for (line in fr.lines()) {
-      if (line.equals("@")) {
+    for (char in fr.chars()) {
+      if (char.equals('@')) {
         break;
       }
-      Console.OUT.println(line);
+      Console.OUT.print(char);
     }
 
     fr.close();
