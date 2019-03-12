@@ -11,14 +11,6 @@ public class SmithWaterman {
     N = 10;
     M = 10;
     H = new Array_2[Double](N+1, M+1);
-
-    // TODO not really needed
-    for (i in 1..N) {
-      H(i, 0) = 0;
-    }
-    for (j in 0..M) {
-      H(0, j) = 0;
-    }
   }
 
   def printH() {
