@@ -42,18 +42,16 @@ class IntParser {
 }
 
 public class SmithWaterman {
-  val N:Long; // Length of A
-  val M:Long; // Length of B
+  var N:Long; // Length of A
+  var M:Long; // Length of B
   val nS:Long; // Number of amino acids
   var H:Array_2[Double]{self!=null};
   var S:Array_2[Int]{self!=null};
 
   public def this() {
-    N = 10;
-    M = 10;
     nS = 24;
-    H = new Array_2[Double](N+1, M+1);
     S = new Array_2[Int](nS, nS);
+    H = new Array_2[Double](N+1, M+1);
   }
 
   def printH() {
@@ -83,13 +81,22 @@ public class SmithWaterman {
     }
   }
 
-  def parseSeq(fr:FileReader) {
+  def parseSeq(fr:FileReader, isFirstSeq:Boolean) {
     var allLines:String = "";
     for (line in fr.lines()) {
       allLines += line;
     }
-    return allLines.substring(Int.operator_as(0),
+    allLines = allLines.substring(
+      Int.operator_as(0),
       allLines.length()-Int.operator_as(1));
+
+    if (isFirstSeq) {
+      N = allLines.length();
+    } else {
+      M = allLines.length();
+    }
+
+    return allLines;
   }
 
   def frSkip(filename:String, lineAfter:Long):FileReader {
@@ -101,6 +108,10 @@ public class SmithWaterman {
     return fr;
   }
 
+  def initH() {
+    H = new Array_2[Double](N+1, M+1);
+  }
+
   public static def main(args:Rail[String]):void {
     if (args.size != 3) {
       Console.OUT.println("Usage: SmithWaterman fileSeqA fileSeqB fileSubst");
@@ -108,15 +119,20 @@ public class SmithWaterman {
     }
 
     val sw = new SmithWaterman();
-    sw.printH();
 
     val frA = sw.frSkip(args(0), 23);
     val frB = sw.frSkip(args(1), 23);
     val frS = sw.frSkip(args(2), 36);
+
     sw.parseS(frS);
     sw.printS();
-    Console.OUT.println(sw.parseSeq(frA));
-    Console.OUT.println(sw.parseSeq(frB));
+    Console.OUT.println(sw.parseSeq(frA, true));
+    Console.OUT.println(sw.N);
+    Console.OUT.println(sw.parseSeq(frB, false));
+    Console.OUT.println(sw.M);
+
+    sw.initH();
+    sw.printH();
 
     frA.close();
     frB.close();
