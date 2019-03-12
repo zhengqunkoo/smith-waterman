@@ -83,6 +83,15 @@ public class SmithWaterman {
     }
   }
 
+  def parseSeq(fr:FileReader) {
+    var allLines:String = "";
+    for (line in fr.lines()) {
+      allLines += line;
+    }
+    return allLines.substring(Int.operator_as(0),
+      allLines.length()-Int.operator_as(1));
+  }
+
   def frSkip(filename:String, lineAfter:Long):FileReader {
     val file = new File(filename);
     val fr = file.openRead();
@@ -93,18 +102,24 @@ public class SmithWaterman {
   }
 
   public static def main(args:Rail[String]):void {
-    if (args.size != 1) {
-      Console.OUT.println("Usage: SmithWaterman filename");
+    if (args.size != 3) {
+      Console.OUT.println("Usage: SmithWaterman fileSeqA fileSeqB fileSubst");
       return;
     }
 
     val sw = new SmithWaterman();
     sw.printH();
 
-    val fr = sw.frSkip(args(0), 36);
-    sw.parseS(fr);
+    val frA = sw.frSkip(args(0), 23);
+    val frB = sw.frSkip(args(1), 23);
+    val frS = sw.frSkip(args(2), 36);
+    sw.parseS(frS);
     sw.printS();
+    Console.OUT.println(sw.parseSeq(frA));
+    Console.OUT.println(sw.parseSeq(frB));
 
-    fr.close();
+    frA.close();
+    frB.close();
+    frS.close();
   }
 }
