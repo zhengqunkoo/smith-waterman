@@ -99,7 +99,7 @@ public class SmithWaterman {
     return allLines;
   }
 
-  def frSkip(filename:String, lineAfter:Long):FileReader {
+  def skipFile(filename:String, lineAfter:Long):FileReader {
     val file = new File(filename);
     val fr = file.openRead();
     for (i in 1..lineAfter) {
@@ -120,9 +120,9 @@ public class SmithWaterman {
 
     val sw = new SmithWaterman();
 
-    val frA = sw.frSkip(args(0), 23);
-    val frB = sw.frSkip(args(1), 23);
-    val frS = sw.frSkip(args(2), 36);
+    val frA = sw.skipFile(args(0), 23);
+    val frB = sw.skipFile(args(1), 23);
+    val frS = sw.skipFile(args(2), 36);
 
     sw.parseS(frS);
     sw.printS();
