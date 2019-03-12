@@ -83,20 +83,25 @@ public class SmithWaterman {
     }
   }
 
+  def frSkip(filename:String, lineAfter:Long):FileReader {
+    val file = new File(filename);
+    val fr = file.openRead();
+    for (i in 1..lineAfter) {
+      fr.readLine();
+    }
+    return fr;
+  }
+
   public static def main(args:Rail[String]):void {
     if (args.size != 1) {
       Console.OUT.println("Usage: SmithWaterman filename");
       return;
     }
 
-    val file = new File(args(0));
-    val fr = file.openRead();
-    for (i in 1..36) {
-      fr.readLine();
-    }
-
     val sw = new SmithWaterman();
     sw.printH();
+
+    val fr = sw.frSkip(args(0), 36);
     sw.parseS(fr);
     sw.printS();
 
