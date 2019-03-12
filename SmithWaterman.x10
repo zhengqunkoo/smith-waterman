@@ -41,9 +41,14 @@ public class SmithWaterman {
     for (i in 1..35) {
       fr.readLine();
     }
+
     for (line in fr.lines()) {
+      if (line.equals("@")) {
+        break;
+      }
       Console.OUT.println(line);
     }
+
     fr.close();
 
     val sw = new SmithWaterman();
