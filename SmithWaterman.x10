@@ -30,7 +30,7 @@ public class SmithWaterman {
 
     val file = new File(args(0));
     val fr = file.openRead();
-    for (i in 1..35) {
+    for (i in 1..36) {
       fr.readLine();
     }
 
