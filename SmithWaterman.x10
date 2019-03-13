@@ -55,6 +55,7 @@ public class SmithWaterman {
   var w:Array_1[Long]{self!=null};
   var H:Array_2[Cell]{self!=null};
   var S:Array_2[Int]{self!=null};
+  var maxH:Cell;
 
   static struct Cell(score:Long, x:Long, y:Long) {}
 
@@ -64,6 +65,7 @@ public class SmithWaterman {
     S = new Array_2[Int](nS, nS);
     H = new Array_2[Cell](0, 0);
     w = new Array_1[Long](0);
+    maxH = Cell(0, 0, 0);
   }
 
   def maxTwo(i:Long, j:Long) {
@@ -196,6 +198,9 @@ public class SmithWaterman {
         // Console.OUT.println("" + pair.first + " " + x + " " + y);
 
         H(i, j) = new Cell(pair.first, x, y);
+        if (pair.first > maxH.score) {
+          maxH = new Cell(pair.first, i, j);
+        }
       }
     }
   }
@@ -249,6 +254,8 @@ public class SmithWaterman {
     sw.initH();
     sw.fillH();
     sw.printH();
+
+    Console.OUT.printf("%d %d %d\n", sw.maxH.score, sw.maxH.x, sw.maxH.y);
 
     frA.close();
     frB.close();
