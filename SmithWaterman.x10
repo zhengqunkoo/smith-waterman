@@ -1,4 +1,5 @@
 import x10.io.Console;
+import x10.array.Array_1;
 import x10.array.Array_2;
 import x10.io.File;
 import x10.io.FileReader;
@@ -48,6 +49,7 @@ public class SmithWaterman {
   var b:String;
   val nS:Long; // Number of amino acids
   val alphabet:String; // Amino acids
+  var w:Array_1[Double]{self!=null};
   var H:Array_2[Double]{self!=null};
   var S:Array_2[Int]{self!=null};
 
@@ -56,6 +58,7 @@ public class SmithWaterman {
     alphabet = "ARNDCQEGHILKMFPSTWYVBZX*";
     S = new Array_2[Int](nS, nS);
     H = new Array_2[Double](n+1, m+1);
+    w = new Array_1[Double](0);
   }
 
   def maxTwo(i:Double, j:Double) {
@@ -135,10 +138,10 @@ public class SmithWaterman {
     for (i in 1..n) {
       for (j in 1..m) {
         for (k in 1..i) {
-          maxK = maxTwo(maxK, H(i-k, j));
+          maxK = maxTwo(maxK, H(i-k, j)-w(k-1));
         }
         for (l in 1..j) {
-          maxL = maxTwo(maxL, H(i, j-l));
+          maxL = maxTwo(maxL, H(i, j-l)-w(l-1));
         }
 
         H(i, j) = maxFour(H(i-1, j-1) + S(
@@ -148,6 +151,20 @@ public class SmithWaterman {
           maxL,
           Double.implicit_operator_as(0));
       }
+    }
+  }
+
+  def initW() {
+    if (n > m) {
+      w = new Array_1[Double](n);
+    } else {
+      w = new Array_1[Double](m);
+    }
+  }
+
+  def fillW() {
+    for (i in 1..w.rank()) {
+      w(i) = i;
     }
   }
 
@@ -171,6 +188,9 @@ public class SmithWaterman {
     sw.parseSeq(frB, false);
     Console.OUT.println(sw.m);
     Console.OUT.println(sw.b);
+
+    sw.initW();
+    sw.fillW();
 
     sw.initH();
     sw.fillH();
