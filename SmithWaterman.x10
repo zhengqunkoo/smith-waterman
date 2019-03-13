@@ -58,6 +58,18 @@ public class SmithWaterman {
     H = new Array_2[Double](n+1, m+1);
   }
 
+  def maxTwo(i:Double, j:Double) {
+    if (i.compareTo(j) > 0) {
+      return i;
+    } else {
+      return j;
+    }
+  }
+
+  def maxFour(i:Double, j:Double, k:Double, l:Double) {
+    return maxTwo(maxTwo(i, j), maxTwo(k, l));
+  }
+
   def printH() {
     for (i in 0..n) {
       for (j in 0..m) {
@@ -116,6 +128,29 @@ public class SmithWaterman {
     H = new Array_2[Double](n+1, m+1);
   }
 
+  def fillH() {
+    var maxK:Double = 0;
+    var maxL:Double = 0;
+
+    for (i in 1..n) {
+      for (j in 1..m) {
+        for (k in 1..i) {
+          maxK = maxTwo(maxK, H(i-k, j));
+        }
+        for (l in 1..j) {
+          maxL = maxTwo(maxL, H(i, j-l));
+        }
+
+        H(i, j) = maxFour(H(i-1, j-1) + S(
+            alphabet.indexOf(a.charAt(Int.operator_as(i-1))),
+            alphabet.indexOf(b.charAt(Int.operator_as(j-1)))),
+          maxK,
+          maxL,
+          Double.implicit_operator_as(0));
+      }
+    }
+  }
+
   public static def main(args:Rail[String]):void {
     if (args.size != 3) {
       Console.OUT.println("Usage: SmithWaterman fileSeqA fileSeqB fileSubst");
@@ -138,6 +173,7 @@ public class SmithWaterman {
     Console.OUT.println(sw.b);
 
     sw.initH();
+    sw.fillH();
     sw.printH();
 
     frA.close();
