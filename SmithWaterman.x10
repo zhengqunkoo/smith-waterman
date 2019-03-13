@@ -47,6 +47,8 @@ public class SmithWaterman {
   var m:Long; // Length of b
   var a:String;
   var b:String;
+  var u:Long; // Gap extension penalty
+  var v:Long; // Gap opening penalty
   val nS:Long; // Number of amino acids
   val alphabet:String; // Amino acids
   var w:Array_1[Double]{self!=null};
@@ -164,13 +166,18 @@ public class SmithWaterman {
 
   def fillW() {
     for (i in 1..w.rank()) {
-      w(i) = i;
+      w(i) = u*i+v;
     }
   }
 
   public static def main(args:Rail[String]):void {
-    if (args.size != 3) {
-      Console.OUT.println("Usage: SmithWaterman fileSeqA fileSeqB fileSubst");
+    if (args.size != 5) {
+      Console.OUT.println("Usage: SmithWaterman
+        fileSeqA
+        fileSeqB
+        fileSubst
+        openPenalty
+        extendPenalty");
       return;
     }
 
@@ -179,6 +186,9 @@ public class SmithWaterman {
     val frA = sw.skipFile(args(0), 23);
     val frB = sw.skipFile(args(1), 23);
     val frS = sw.skipFile(args(2), 36);
+
+    sw.v = Long.parse(args(3));
+    sw.u = Long.parse(args(4));
 
     sw.parseS(frS);
     sw.printS();
