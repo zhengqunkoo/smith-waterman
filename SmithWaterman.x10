@@ -5,6 +5,7 @@ import x10.io.File;
 import x10.io.FileReader;
 import x10.io.ReaderIterator;
 import x10.util.Pair;
+import x10.util.StringBuilder;
 
 /**
  * Amino acids do not include gap codon.
@@ -211,6 +212,34 @@ public class SmithWaterman {
     }
   }
 
+  def backtrackH(pair:Pair[StringBuilder, StringBuilder], i:Long, j:Long) {
+    if (i == 0 && j == 0) {
+      return new Pair(pair.first.add(a.charAt(Int.operator_as(i))),
+        pair.second.add(b.charAt(Int.operator_as(j))));
+    }
+
+    val cell = H(i, j);
+    val k = cell.x;
+    val l = cell.y;
+    var sb1:StringBuilder = new StringBuilder();
+    var sb2:StringBuilder = new StringBuilder();
+
+    if (i-k != 1) {
+      sb1 = pair.first.add(' ');
+    } else {
+      sb1 = pair.first.add(a.charAt(Int.operator_as(k)));
+    }
+    if (j-l != 1) {
+      sb2 = pair.second.add(' ');
+    } else {
+      sb2 = pair.second.add(b.charAt(Int.operator_as(l)));
+    }
+
+    return backtrackH(new Pair[StringBuilder, StringBuilder](sb1, sb2),
+      k,
+      l);
+  }
+
   public static def main(args:Rail[String]):void {
     if (args.size != 5) {
       Console.OUT.println("Usage: SmithWaterman
@@ -247,7 +276,13 @@ public class SmithWaterman {
     sw.fillH();
     sw.printH();
 
-    Console.OUT.printf("%d %d %d\n", sw.maxH.score, sw.maxH.x, sw.maxH.y);
+    val pair = sw.backtrackH(
+      Pair[StringBuilder, StringBuilder](
+        new StringBuilder(),
+        new StringBuilder()),
+      sw.maxH.x,
+      sw.maxH.y);
+    Console.OUT.printf("%s\n%s", pair.first, pair.second);
 
     frA.close();
     frB.close();
