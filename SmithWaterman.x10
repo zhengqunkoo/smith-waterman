@@ -44,6 +44,8 @@ class IntParser {
 public class SmithWaterman {
   var n:Long; // Length of a
   var m:Long; // Length of b
+  var a:String;
+  var b:String;
   val nS:Long; // Number of amino acids
   var H:Array_2[Double]{self!=null};
   var S:Array_2[Int]{self!=null};
@@ -92,8 +94,10 @@ public class SmithWaterman {
 
     if (isFirstSeq) {
       n = allLines.length();
+      a = allLines;
     } else {
       m = allLines.length();
+      b = allLines;
     }
   }
 
@@ -126,8 +130,10 @@ public class SmithWaterman {
     sw.printS();
     sw.parseSeq(frA, true);
     Console.OUT.println(sw.n);
+    Console.OUT.println(sw.a);
     sw.parseSeq(frB, false);
     Console.OUT.println(sw.m);
+    Console.OUT.println(sw.b);
 
     sw.initH();
     sw.printH();
