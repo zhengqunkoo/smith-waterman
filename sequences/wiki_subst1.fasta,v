@@ -6,7 +6,7 @@ comment	@# @;
 
 
 1.1
-date	2019.03.13.16.21.00;	author koo;	state Exp;
+date	2019.03.13.16.35.00;	author koo;	state Exp;
 branches;
 next	;
 
@@ -20,5 +20,5 @@ log
 @Initial import
 @
 text
-@>wiki_gap2.fasta,v
-TAGCCCTATCGGTCA@
+@>wiki_subst1.fasta,v
+TGTTACGG@

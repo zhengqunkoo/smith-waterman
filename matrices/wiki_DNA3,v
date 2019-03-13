@@ -7,12 +7,12 @@ comment  @# @;
 
 
 1.1
-date     2005.05.26.19.52.13;  author joannes;  state Exp;
+date     2019.03.13.16.35.00;  author koo;  state Exp;
 branches 1.1.1.1;
 next     ;
 
 1.1.1.1
-date     2005.05.26.19.52.13;  author joannes;  state Exp;
+date     2019.03.13.16.35.00;  author koo;  state Exp;
 branches ;
 next     ;
 
@@ -34,7 +34,7 @@ text
 #  Cluster Percentage: >= 100
 #  Entropy =   1.4516, Expected =  -1.0948
  	A 	G 	C 	T
-A 	1 	-1 	-1 	-1
-G 	-1 	1 	-1 	-1
-C 	-1 	-1 	1 	-1
-T 	-1 	-1 	-1 	1
+A 	3 	-3 	-3 	-3
+G 	-3 	3 	-3 	-3
+C 	-3 	-3 	3 	-3
+T 	-3 	-3 	-3 	3
