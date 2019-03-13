@@ -96,7 +96,7 @@ public class SmithWaterman {
   def printH() {
     for (i in 0..n) {
       for (j in 0..m) {
-        Console.OUT.printf("%d ", H(i, j).score);
+        Console.OUT.printf("(%d %d %d)", H(i, j).score, H(i, j).x, H(i, j).y);
       }
       Console.OUT.println();
     }
