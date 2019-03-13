@@ -153,15 +153,25 @@ public class SmithWaterman {
 
   def fillH() {
     var maxK:Long = 0;
+    var maxKInd:Long = 1;
+    var maxLInd:Long = 1;
     var maxL:Long = 0;
 
     for (i in 1..n) {
       for (j in 1..m) {
         for (k in 1..i) {
+          var oldK:Long = maxK;
           maxK = maxTwo(maxK, H(i-k, j).score-w(k-1));
+          if (maxK == oldK) {
+            maxKInd = k;
+          }
         }
         for (l in 1..j) {
-          maxL = maxTwo(maxL, H(i, j-l).score-w(l-1));
+          var oldL:Long = maxL;
+          maxL = maxTwo(maxL, H(i, j-1).score-w(l-1));
+          if (maxL == oldL) {
+            maxLInd = l;
+          }
         }
 
         val pair = maxFour(H(i-1, j-1).score + S(
@@ -170,7 +180,22 @@ public class SmithWaterman {
           maxK,
           maxL,
           0);
-        H(i, j) = new Cell(pair.first, 0, 0);
+
+        var x:Long = 0;
+        var y:Long = 0;
+        if (pair.second == 0) {
+          x = i-1;
+          y = j-1;
+        } else if (pair.second == 1) {
+          x = i-maxKInd;
+          y = j;
+        } else if (pair.second == 2) {
+          x = i;
+          y = i-maxLInd;
+        }
+        // Console.OUT.println("" + pair.first + " " + x + " " + y);
+
+        H(i, j) = new Cell(pair.first, x, y);
       }
     }
   }
