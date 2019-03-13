@@ -42,8 +42,8 @@ class IntParser {
 }
 
 public class SmithWaterman {
-  var N:Long; // Length of A
-  var M:Long; // Length of B
+  var n:Long; // Length of a
+  var m:Long; // Length of b
   val nS:Long; // Number of amino acids
   var H:Array_2[Double]{self!=null};
   var S:Array_2[Int]{self!=null};
@@ -51,12 +51,12 @@ public class SmithWaterman {
   public def this() {
     nS = 24;
     S = new Array_2[Int](nS, nS);
-    H = new Array_2[Double](N+1, M+1);
+    H = new Array_2[Double](n+1, m+1);
   }
 
   def printH() {
-    for (i in 0..N) {
-      for (j in 0..M) {
+    for (i in 0..n) {
+      for (j in 0..m) {
         Console.OUT.printf("%1.4f ", H(i, j));
       }
       Console.OUT.println();
@@ -91,12 +91,10 @@ public class SmithWaterman {
       allLines.length()-Int.operator_as(1));
 
     if (isFirstSeq) {
-      N = allLines.length();
+      n = allLines.length();
     } else {
-      M = allLines.length();
+      m = allLines.length();
     }
-
-    return allLines;
   }
 
   def skipFile(filename:String, lineAfter:Long):FileReader {
@@ -109,7 +107,7 @@ public class SmithWaterman {
   }
 
   def initH() {
-    H = new Array_2[Double](N+1, M+1);
+    H = new Array_2[Double](n+1, m+1);
   }
 
   public static def main(args:Rail[String]):void {
@@ -126,10 +124,10 @@ public class SmithWaterman {
 
     sw.parseS(frS);
     sw.printS();
-    Console.OUT.println(sw.parseSeq(frA, true));
-    Console.OUT.println(sw.N);
-    Console.OUT.println(sw.parseSeq(frB, false));
-    Console.OUT.println(sw.M);
+    sw.parseSeq(frA, true);
+    Console.OUT.println(sw.n);
+    sw.parseSeq(frB, false);
+    Console.OUT.println(sw.m);
 
     sw.initH();
     sw.printH();
