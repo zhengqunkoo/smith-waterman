@@ -44,6 +44,31 @@ class IntParser {
   }
 }
 
+class CharParser {
+  var line:String;
+
+  public def this(s:String) {
+    line = s.trim();
+  }
+
+  public def hasNext() {
+    return line.length() != Int.operator_as(0);
+  }
+
+  public def next() {
+    val c:Char;
+    val ind = line.indexOf(' ');
+    if (ind.equals(Int.operator_as(-1))) {
+      c = line.charAt(Int.operator_as(0));
+      line = "";
+    } else {
+      c = line.substring(Int.operator_as(0), ind).charAt(Int.operator_as(0));
+      line = line.substring(ind).trim();
+    }
+    return c;
+  }
+}
+
 public class SmithWaterman {
   var n:Long; // Length of a
   var m:Long; // Length of b
@@ -51,8 +76,7 @@ public class SmithWaterman {
   var b:String;
   var u:Long; // Gap extension penalty
   var v:Long; // Gap opening penalty
-  val nS:Long; // Number of amino acids
-  val alphabet:String; // Amino acids
+  var alphabet:String; // Amino acids
   var w:Array_1[Long]{self!=null};
   var H:Array_2[Cell]{self!=null};
   var S:Array_2[Int]{self!=null};
@@ -61,9 +85,7 @@ public class SmithWaterman {
   static struct Cell(score:Long, x:Long, y:Long) {}
 
   public def this() {
-    nS = 24;
-    alphabet = "ARNDCQEGHILKMFPSTWYVBZX*";
-    S = new Array_2[Int](nS, nS);
+    S = new Array_2[Int](0, 0);
     H = new Array_2[Cell](0, 0);
     w = new Array_1[Long](0);
     maxH = Cell(0, 0, 0);
@@ -106,8 +128,8 @@ public class SmithWaterman {
   }
 
   def printS() {
-    for (i in 0..(nS-1)) {
-      for (j in 0..(nS-1)) {
+    for (i in 0..(alphabet.length()-1)) {
+      for (j in 0..(alphabet.length()-1)) {
         Console.OUT.printf("%d ", S(i, j));
       }
       Console.OUT.println();
@@ -116,8 +138,8 @@ public class SmithWaterman {
 
   def parseS(fr:FileReader) {
     val ip = new IntParser(fr);
-    for (i in 0..(nS-1)) {
-      for (j in 0..(nS-1)) {
+    for (i in 0..(alphabet.length()-1)) {
+      for (j in 0..(alphabet.length()-1)) {
         S(i, j) = ip.next();
       }
     }
@@ -141,11 +163,25 @@ public class SmithWaterman {
     }
   }
 
-  def skipFile(filename:String, lineAfter:Long):FileReader {
+  def skipFile(filename:String,
+    lineAfter:Long,
+    isReadAlphabet:Boolean):FileReader {
     val file = new File(filename);
     val fr = file.openRead();
-    for (i in 1..lineAfter) {
-      fr.readLine();
+    if (isReadAlphabet) {
+      for (i in 1..(lineAfter-1)) {
+        fr.readLine();
+      }
+      val cp = new CharParser(fr.readLine());
+      val sb = new StringBuilder();
+      while (cp.hasNext()) {
+        sb.add(cp.next());
+      }
+      alphabet = sb.toString();
+    } else {
+      for (i in 1..lineAfter) {
+        fr.readLine();
+      }
     }
     return fr;
   }
@@ -240,6 +276,10 @@ public class SmithWaterman {
       l);
   }
 
+  def initS() {
+    S = new Array_2[Int](alphabet.length(), alphabet.length());
+  }
+
   public static def main(args:Rail[String]):void {
     if (args.size != 5) {
       Console.OUT.println("Usage: SmithWaterman
@@ -253,13 +293,14 @@ public class SmithWaterman {
 
     val sw = new SmithWaterman();
 
-    val frA = sw.skipFile(args(0), 23);
-    val frB = sw.skipFile(args(1), 23);
-    val frS = sw.skipFile(args(2), 36);
+    val frA = sw.skipFile(args(0), 23, false);
+    val frB = sw.skipFile(args(1), 23, false);
+    val frS = sw.skipFile(args(2), 36, true);
 
     sw.v = Long.parse(args(3));
     sw.u = Long.parse(args(4));
 
+    sw.initS();
     sw.parseS(frS);
     sw.printS();
     sw.parseSeq(frA, true);
