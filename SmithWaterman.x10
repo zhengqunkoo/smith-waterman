@@ -53,14 +53,16 @@ public class SmithWaterman {
   val nS:Long; // Number of amino acids
   val alphabet:String; // Amino acids
   var w:Array_1[Long]{self!=null};
-  var H:Array_2[Long]{self!=null};
+  var H:Array_2[Cell]{self!=null};
   var S:Array_2[Int]{self!=null};
+
+  static struct Cell(score:Long, x:Long, y:Long) {}
 
   public def this() {
     nS = 24;
     alphabet = "ARNDCQEGHILKMFPSTWYVBZX*";
     S = new Array_2[Int](nS, nS);
-    H = new Array_2[Long](0, 0);
+    H = new Array_2[Cell](0, 0);
     w = new Array_1[Long](0);
   }
 
@@ -94,7 +96,7 @@ public class SmithWaterman {
   def printH() {
     for (i in 0..n) {
       for (j in 0..m) {
-        Console.OUT.printf("%d ", H(i, j));
+        Console.OUT.printf("%d ", H(i, j).score);
       }
       Console.OUT.println();
     }
@@ -146,7 +148,7 @@ public class SmithWaterman {
   }
 
   def initH() {
-    H = new Array_2[Long](n+1, m+1);
+    H = new Array_2[Cell](n+1, m+1);
   }
 
   def fillH() {
@@ -156,19 +158,19 @@ public class SmithWaterman {
     for (i in 1..n) {
       for (j in 1..m) {
         for (k in 1..i) {
-          maxK = maxTwo(maxK, H(i-k, j)-w(k-1));
+          maxK = maxTwo(maxK, H(i-k, j).score-w(k-1));
         }
         for (l in 1..j) {
-          maxL = maxTwo(maxL, H(i, j-l)-w(l-1));
+          maxL = maxTwo(maxL, H(i, j-l).score-w(l-1));
         }
 
-        val pair = maxFour(H(i-1, j-1) + S(
+        val pair = maxFour(H(i-1, j-1).score + S(
             alphabet.indexOf(a.charAt(Int.operator_as(i-1))),
             alphabet.indexOf(b.charAt(Int.operator_as(j-1)))),
           maxK,
           maxL,
           0);
-        H(i, j) = pair.first;
+        H(i, j) = new Cell(pair.first, 0, 0);
       }
     }
   }
