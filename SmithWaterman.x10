@@ -4,6 +4,7 @@ import x10.array.Array_2;
 import x10.io.File;
 import x10.io.FileReader;
 import x10.io.ReaderIterator;
+import x10.util.Pair;
 
 /**
  * Amino acids do not include gap codon.
@@ -51,19 +52,19 @@ public class SmithWaterman {
   var v:Long; // Gap opening penalty
   val nS:Long; // Number of amino acids
   val alphabet:String; // Amino acids
-  var w:Array_1[Double]{self!=null};
-  var H:Array_2[Double]{self!=null};
+  var w:Array_1[Long]{self!=null};
+  var H:Array_2[Long]{self!=null};
   var S:Array_2[Int]{self!=null};
 
   public def this() {
     nS = 24;
     alphabet = "ARNDCQEGHILKMFPSTWYVBZX*";
     S = new Array_2[Int](nS, nS);
-    H = new Array_2[Double](n+1, m+1);
-    w = new Array_1[Double](0);
+    H = new Array_2[Long](0, 0);
+    w = new Array_1[Long](0);
   }
 
-  def maxTwo(i:Double, j:Double) {
+  def maxTwo(i:Long, j:Long) {
     if (i.compareTo(j) > 0) {
       return i;
     } else {
@@ -71,14 +72,29 @@ public class SmithWaterman {
     }
   }
 
-  def maxFour(i:Double, j:Double, k:Double, l:Double) {
-    return maxTwo(maxTwo(i, j), maxTwo(k, l));
+  def maxFour(i:Long, j:Long, k:Long, l:Long) {
+    var ind:Long = 0;
+    val m1:Long = maxTwo(i, j);
+    val m2:Long = maxTwo(k, l);
+    var m3:Long = maxTwo(m1, m2);
+
+    if (i == m3) {
+      ind = 0;
+    } else if (j == m3) {
+      ind = 1;
+    } else if (k == m3) {
+      ind = 2;
+    } else if (l == m3) {
+      ind = 3;
+    }
+
+    return new Pair(m3, ind);
   }
 
   def printH() {
     for (i in 0..n) {
       for (j in 0..m) {
-        Console.OUT.printf("%1.4f ", H(i, j));
+        Console.OUT.printf("%d ", H(i, j));
       }
       Console.OUT.println();
     }
@@ -130,12 +146,12 @@ public class SmithWaterman {
   }
 
   def initH() {
-    H = new Array_2[Double](n+1, m+1);
+    H = new Array_2[Long](n+1, m+1);
   }
 
   def fillH() {
-    var maxK:Double = 0;
-    var maxL:Double = 0;
+    var maxK:Long = 0;
+    var maxL:Long = 0;
 
     for (i in 1..n) {
       for (j in 1..m) {
@@ -146,21 +162,22 @@ public class SmithWaterman {
           maxL = maxTwo(maxL, H(i, j-l)-w(l-1));
         }
 
-        H(i, j) = maxFour(H(i-1, j-1) + S(
+        val pair = maxFour(H(i-1, j-1) + S(
             alphabet.indexOf(a.charAt(Int.operator_as(i-1))),
             alphabet.indexOf(b.charAt(Int.operator_as(j-1)))),
           maxK,
           maxL,
-          Double.implicit_operator_as(0));
+          0);
+        H(i, j) = pair.first;
       }
     }
   }
 
   def initW() {
     if (n > m) {
-      w = new Array_1[Double](n);
+      w = new Array_1[Long](n);
     } else {
-      w = new Array_1[Double](m);
+      w = new Array_1[Long](m);
     }
   }
 
