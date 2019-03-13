@@ -47,11 +47,13 @@ public class SmithWaterman {
   var a:String;
   var b:String;
   val nS:Long; // Number of amino acids
+  val alphabet:String; // Amino acids
   var H:Array_2[Double]{self!=null};
   var S:Array_2[Int]{self!=null};
 
   public def this() {
     nS = 24;
+    alphabet = "ARNDCQEGHILKMFPSTWYVBZX*";
     S = new Array_2[Int](nS, nS);
     H = new Array_2[Double](n+1, m+1);
   }
