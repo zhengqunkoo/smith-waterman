@@ -192,8 +192,6 @@ public class SmithWaterman {
 
   def fillH() {
     var maxK:Long = 0;
-    var maxKInd:Long = 1;
-    var maxLInd:Long = 1;
     var maxL:Long = 0;
 
     for (i in 1..n) {
