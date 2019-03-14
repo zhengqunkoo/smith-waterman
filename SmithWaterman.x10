@@ -197,10 +197,10 @@ public class SmithWaterman {
     for (i in 1..n) {
       for (j in 1..m) {
         for (k in 1..i) {
-          maxK = maxTwo(maxK, H(i-k, j).score-w(k-1));
+          maxK = maxTwo(maxK, H(i-k, j).score-w(k));
         }
         for (l in 1..j) {
-          maxL = maxTwo(maxL, H(i, j-1).score-w(l-1));
+          maxL = maxTwo(maxL, H(i, j-l).score-w(l));
         }
 
         val pair = maxFour(H(i-1, j-1).score + S(
@@ -234,9 +234,9 @@ public class SmithWaterman {
 
   def initW() {
     if (n > m) {
-      w = new Array_1[Long](n);
+      w = new Array_1[Long](n+1);
     } else {
-      w = new Array_1[Long](m);
+      w = new Array_1[Long](m+1);
     }
   }
 
