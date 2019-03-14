@@ -191,14 +191,13 @@ public class SmithWaterman {
   }
 
   def fillH() {
-    var maxK:Long = 0;
-    var maxL:Long = 0;
-
     for (i in 1..n) {
       for (j in 1..m) {
+        var maxK:Long = 0;
         for (k in 1..i) {
           maxK = maxTwo(maxK, H(i-k, j).score-w(k));
         }
+        var maxL:Long = 0;
         for (l in 1..j) {
           maxL = maxTwo(maxL, H(i, j-l).score-w(l));
         }
