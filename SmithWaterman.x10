@@ -246,12 +246,11 @@ public class SmithWaterman {
   }
 
   def backtrackH(pair:Pair[StringBuilder, StringBuilder], i:Long, j:Long) {
-    if (i == 0 && j == 0) {
-      return new Pair(pair.first.add(a.charAt(Int.operator_as(i))),
-        pair.second.add(b.charAt(Int.operator_as(j))));
+    val cell = H(i, j);
+    if (cell.score == 0) {
+      return pair;
     }
 
-    val cell = H(i, j);
     val k = cell.x;
     val l = cell.y;
     var sb1:StringBuilder = new StringBuilder();
