@@ -27,16 +27,16 @@ class IntParser {
 
   public def next() {
     if (line.equals("")) {
-      line = ri.next().substring(Int.operator_as(1)).trim();
+      line = ri.next().substring(1n).trim();
     }
 
     val i:Int;
     val ind = line.indexOf(' ');
-    if (ind.equals(Int.operator_as(-1))) {
+    if (ind.equals(-1n)) {
       i = Int.parse(line);
       line = "";
     } else {
-      i = Int.parse(line.substring(Int.operator_as(0), ind));
+      i = Int.parse(line.substring(0n, ind));
       line = line.substring(ind).trim();
     }
     return i;
@@ -51,17 +51,17 @@ class CharParser {
   }
 
   public def hasNext() {
-    return line.length() != Int.operator_as(0);
+    return line.length() != 0n;
   }
 
   public def next() {
     val c:Char;
     val ind = line.indexOf(' ');
-    if (ind.equals(Int.operator_as(-1))) {
-      c = line.charAt(Int.operator_as(0));
+    if (ind.equals(-1n)) {
+      c = line.charAt(0n);
       line = "";
     } else {
-      c = line.substring(Int.operator_as(0), ind).charAt(Int.operator_as(0));
+      c = line.substring(0n, ind).charAt(0n);
       line = line.substring(ind).trim();
     }
     return c;
@@ -150,8 +150,8 @@ public class SmithWaterman {
       allLines += line;
     }
     allLines = allLines.substring(
-      Int.operator_as(0),
-      allLines.length()-Int.operator_as(1));
+      0n,
+      allLines.length()-1n);
 
     if (isFirstSeq) {
       n = allLines.length();
@@ -165,7 +165,7 @@ public class SmithWaterman {
   def skipComments(fr:FileReader) {
     // Read until "text"
     var line:String = fr.readLine();
-    while (line.compareTo("text") != Int.operator_as(0)) {
+    while (line.compareTo("text") != 0n) {
       line = fr.readLine();
     };
 
@@ -175,12 +175,12 @@ public class SmithWaterman {
     // Skip comments
     while (true) {
       // Skip leading '@', if any
-      if (line.charAt(Int.operator_as(0)) == '@') {
-        line = line.substring(Int.operator_as(1));
+      if (line.charAt(0n) == '@') {
+        line = line.substring(1n);
       }
 
       // Ignore all comments
-      if (line.charAt(Int.operator_as(0)) == '#') {
+      if (line.charAt(0n) == '#') {
         line = fr.readLine();
       } else {
         break;
@@ -224,8 +224,8 @@ public class SmithWaterman {
         }
 
         val pair = maxFour(H(i-1, j-1).score + S(
-            alphabet.indexOf(a.charAt(Int.operator_as(i-1))),
-            alphabet.indexOf(b.charAt(Int.operator_as(j-1)))),
+            alphabet.indexOf(a.charAt((i-1) as Int)),
+            alphabet.indexOf(b.charAt((j-1) as Int))),
           maxK,
           maxL,
           0);
@@ -279,12 +279,12 @@ public class SmithWaterman {
     if (i-k != 1) {
       sb1 = pair.first.add('-');
     } else {
-      sb1 = pair.first.add(a.charAt(Int.operator_as(k)));
+      sb1 = pair.first.add(a.charAt(k as Int));
     }
     if (j-l != 1) {
       sb2 = pair.second.add('-');
     } else {
-      sb2 = pair.second.add(b.charAt(Int.operator_as(l)));
+      sb2 = pair.second.add(b.charAt(l as Int));
     }
 
     return backtrackH(new Pair[StringBuilder, StringBuilder](sb1, sb2),
