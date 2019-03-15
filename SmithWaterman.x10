@@ -31,7 +31,6 @@ class IntParser {
 
     val i:Int;
     val ind = line.indexOf(' ');
-    // Console.OUT.println("Bef: " + ind + " " + line);
     if (ind.equals(Int.operator_as(-1))) {
       i = Int.parse(line);
       line = "";
@@ -39,7 +38,6 @@ class IntParser {
       i = Int.parse(line.substring(Int.operator_as(0), ind));
       line = line.substring(ind).trim();
     }
-    // Console.OUT.println("Aft: " + ind + " " + i + " " + line);
     return i;
   }
 }
@@ -221,7 +219,6 @@ public class SmithWaterman {
           x = i;
           y = j-1;
         }
-        // Console.OUT.println("" + pair.first + " " + x + " " + y);
 
         H(i, j) = new Cell(pair.first, x, y);
         if (pair.first > maxH.score) {
