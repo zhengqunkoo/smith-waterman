@@ -6,6 +6,7 @@ import x10.io.FileReader;
 import x10.io.ReaderIterator;
 import x10.util.Pair;
 import x10.util.StringBuilder;
+import x10.util.Timer;
 
 /**
  * Amino acids do not include gap codon.
@@ -307,16 +308,23 @@ public class SmithWaterman {
     sw.fillW();
 
     sw.initH();
+    val fillStart = Timer.nanoTime();
     sw.fillH();
+    val fillStop = Timer.nanoTime();
     sw.printH();
 
+    val backtrackStart = Timer.nanoTime();
     val pair = sw.backtrackH(
       Pair[StringBuilder, StringBuilder](
         new StringBuilder(),
         new StringBuilder()),
       sw.maxH.x,
       sw.maxH.y);
-    Console.OUT.printf("%s\n%s", pair.first, pair.second);
+    val backtrackStop = Timer.nanoTime();
+    Console.OUT.printf("%s\n%s\n", pair.first, pair.second);
+    Console.OUT.println("Timing (ns):");
+    Console.OUT.printf("fill: %d\n", fillStop - fillStart);
+    Console.OUT.printf("backtrack: %d\n", backtrackStop - backtrackStart);
 
     frA.close();
     frB.close();
