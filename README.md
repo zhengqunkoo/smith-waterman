@@ -17,7 +17,7 @@ This is the master branch.
   ```
   x10c++ SmithWaterman.x10 \
   && ./a.out sequences/wiki_gap1.fasta,v sequences/wiki_gap2.fasta,v \
-  matrices/wiki_DNA1,v 5 1 > out \
+  matrices/EDNAFULL,v 5 1 > out \
   && cat out
   ```
 - From [Wikipedia's subst example].
