@@ -240,7 +240,7 @@ public class SmithWaterman {
   }
 
   def fillW() {
-    for (i in 1..w.rank()) {
+    for (i in 1..(w.size-1)) {
       w(i) = u*i+v;
     }
   }
