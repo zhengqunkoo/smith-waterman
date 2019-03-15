@@ -92,7 +92,7 @@ public class SmithWaterman {
   }
 
   def maxTwo(i:Long, j:Long) {
-    if (i.compareTo(j) > 0) {
+    if (i > j) {
       return i;
     } else {
       return j;
