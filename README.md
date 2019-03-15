@@ -1,6 +1,9 @@
 # Smith-Waterman Algorithm
 In the x10 language, for the National University of Singapore's CS3211 module.
 
+## Branch Notes
+This is the master branch.
+
 ## Usage
 - To avoid badly formatted stdout, redirect to file.
   ```
