@@ -194,12 +194,12 @@ public class SmithWaterman {
     for (i in 1..n) {
       for (j in 1..m) {
         var maxK:Long = 0;
-        for (k in 1..i) {
-          maxK = maxTwo(maxK, H(i-k, j).score-w(k));
+        for (k in 1..(i-1)) {
+          maxK = maxTwo(maxK, H(k, j).score-w(i-k));
         }
         var maxL:Long = 0;
-        for (l in 1..j) {
-          maxL = maxTwo(maxL, H(i, j-l).score-w(l));
+        for (l in 1..(j-1)) {
+          maxL = maxTwo(maxL, H(i, l).score-w(j-l));
         }
 
         val pair = maxFour(H(i-1, j-1).score + S(
