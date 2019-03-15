@@ -162,25 +162,47 @@ public class SmithWaterman {
     }
   }
 
-  def skipFile(filename:String,
-    lineAfter:Long,
-    isReadAlphabet:Boolean):FileReader {
-    val file = new File(filename);
-    val fr = file.openRead();
-    if (isReadAlphabet) {
-      for (i in 1..(lineAfter-1)) {
-        fr.readLine();
+  def skipComments(fr:FileReader) {
+    // Read until "text"
+    var line:String = fr.readLine();
+    while (line.compareTo("text") != Int.operator_as(0)) {
+      line = fr.readLine();
+    };
+
+    // Skip "text"
+    line = fr.readLine();
+
+    // Skip comments
+    while (true) {
+      // Skip leading '@', if any
+      if (line.charAt(Int.operator_as(0)) == '@') {
+        line = line.substring(Int.operator_as(1));
       }
-      val cp = new CharParser(fr.readLine());
+
+      // Ignore all comments
+      if (line.charAt(Int.operator_as(0)) == '#') {
+        line = fr.readLine();
+      } else {
+        break;
+      }
+    }
+
+    return new Pair(fr, line);
+  }
+
+  def skipFile(filename:String, isReadAlphabet:Boolean):FileReader {
+    val file = new File(filename);
+    var fr:FileReader = file.openRead();
+    val pair = skipComments(fr);
+    fr = pair.first;
+    if (isReadAlphabet) {
+      val line = pair.second;
+      val cp = new CharParser(line);
       val sb = new StringBuilder();
       while (cp.hasNext()) {
         sb.add(cp.next());
       }
       alphabet = sb.toString();
-    } else {
-      for (i in 1..lineAfter) {
-        fr.readLine();
-      }
     }
     return fr;
   }
@@ -287,9 +309,9 @@ public class SmithWaterman {
 
     val sw = new SmithWaterman();
 
-    val frA = sw.skipFile(args(0), 23, false);
-    val frB = sw.skipFile(args(1), 23, false);
-    val frS = sw.skipFile(args(2), 36, true);
+    val frA = sw.skipFile(args(0), false);
+    val frB = sw.skipFile(args(1), false);
+    val frS = sw.skipFile(args(2), true);
 
     sw.v = Long.parse(args(3));
     sw.u = Long.parse(args(4));
