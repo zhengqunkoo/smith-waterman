@@ -257,12 +257,12 @@ public class SmithWaterman {
     var sb2:StringBuilder = new StringBuilder();
 
     if (i-k != 1) {
-      sb1 = pair.first.add(' ');
+      sb1 = pair.first.add('-');
     } else {
       sb1 = pair.first.add(a.charAt(Int.operator_as(k)));
     }
     if (j-l != 1) {
-      sb2 = pair.second.add(' ');
+      sb2 = pair.second.add('-');
     } else {
       sb2 = pair.second.add(b.charAt(Int.operator_as(l)));
     }
