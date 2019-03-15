@@ -2,7 +2,9 @@
 In the x10 language, for the National University of Singapore's CS3211 module.
 
 ## Branch Notes
-This is the master branch.
+Define a new fields `maxK` and `maxL` in `Cell` structure, such that for each 
+step of the algorithm, each cell only needs to check its direct neighbors for
+`maxK` and maxL`.
 
 ## Usage
 - To avoid badly formatted stdout, redirect to file.
