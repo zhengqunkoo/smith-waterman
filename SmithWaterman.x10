@@ -120,7 +120,7 @@ public class SmithWaterman {
   def printH() {
     for (i in 0..n) {
       for (j in 0..m) {
-        Console.OUT.printf("(%d %d %d)", H(i, j).score, H(i, j).x, H(i, j).y);
+        Console.OUT.printf("(%d)", H(i, j).score);
       }
       Console.OUT.println();
     }
@@ -330,10 +330,10 @@ public class SmithWaterman {
     sw.fillW();
 
     sw.initH();
-    val fillStart = Timer.nanoTime();
+    val fillStart = Timer.milliTime();
     sw.fillH();
-    val fillStop = Timer.nanoTime();
-    sw.printH();
+    val fillStop = Timer.milliTime();
+    //sw.printH();
 
     val backtrackStart = Timer.nanoTime();
     val pair = sw.backtrackH(
@@ -347,9 +347,10 @@ public class SmithWaterman {
     Console.OUT.println("Timing (ns):");
     Console.OUT.printf("fill: %d\n", fillStop - fillStart);
     Console.OUT.printf("backtrack: %d\n", backtrackStop - backtrackStart);
-
+    Console.OUT.printf("maxH: %d\n", sw.maxH.score);
     frA.close();
     frB.close();
     frS.close();
   }
 }
+
