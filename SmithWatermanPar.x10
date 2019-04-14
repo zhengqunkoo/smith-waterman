@@ -207,7 +207,7 @@ public class SmithWatermanPar {
     val vectorCount = n / VECTOR_SIZE + 1;
     EE = new Rail[Vector](vectorCount+1);
     HH = new Rail[Vector](vectorCount+1);
-    H = new Array_2[Cell](m+1, n+1);
+    H = new Array_2[Cell](n+1, m+1);
 
   }
 
@@ -308,13 +308,13 @@ public class SmithWatermanPar {
 
         for (vInd in 0..7) {
           val row: Long = i*VECTOR_SIZE+vInd;
-          H(j+1, row+1) = new Cell(tempH(vInd), j+1, row+1);
+          H(row+1, j+1) = new Cell(tempH(vInd), j+1, row+1);
         }
         
         val max = score.maxVector(tempH, score);
         
         if (max.second > maxH.score){
-          maxH = new Cell(max.second, j+1, i*VECTOR_SIZE+max.first+1);
+          maxH = new Cell(max.second, i*VECTOR_SIZE+max.first+1, j+1);
         }
       }
     }
@@ -362,8 +362,8 @@ public class SmithWatermanPar {
   }
 
   def printH() {
-    for (i in 0..m) {
-      for (j in 0..n) {
+    for (i in 0..n) {
+      for (j in 0..m) {
         Console.OUT.printf("(%d)", H(i, j).score);
       }
       Console.OUT.println();
@@ -535,12 +535,12 @@ public class SmithWatermanPar {
     if (i-k != 1) {
       sb1 = pair.first.add('-');
     } else {
-      sb1 = pair.first.add(b.charAt(k as Int));
+      sb1 = pair.first.add(a.charAt(k as Int));
     }
     if (j-l != 1) {
       sb2 = pair.second.add('-');
     } else {
-      sb2 = pair.second.add(a.charAt(l as Int));
+      sb2 = pair.second.add(b.charAt(l as Int));
     }
 
     return backtrackH(new Pair[StringBuilder, StringBuilder](sb1, sb2),
@@ -586,7 +586,7 @@ public class SmithWatermanPar {
     val fillStart = Timer.milliTime();
     sw.fillH();
     val fillStop = Timer.milliTime();
-    //sw.printH();
+    sw.printH();
 
     val backtrackStart = Timer.nanoTime();
     val pair = sw.backtrackH(
