@@ -249,6 +249,8 @@ public class SmithWaterman {
         }
       }
     }
+    Console.OUT.println("----3----");
+    Console.OUT.println("----3----");
   }
 
   def initW() {
@@ -316,9 +318,6 @@ public class SmithWaterman {
     sw.v = Long.parse(args(3));
     sw.u = Long.parse(args(4));
 
-    sw.initS();
-    sw.parseS(frS);
-    sw.printS();
     sw.parseSeq(frA, true);
     Console.OUT.println(sw.n);
     Console.OUT.println(sw.a);
@@ -326,6 +325,10 @@ public class SmithWaterman {
     Console.OUT.println(sw.m);
     Console.OUT.println(sw.b);
 
+
+    sw.initS();
+    sw.parseS(frS);
+    sw.printS();
     sw.initW();
     sw.fillW();
 
@@ -333,7 +336,7 @@ public class SmithWaterman {
     val fillStart = Timer.milliTime();
     sw.fillH();
     val fillStop = Timer.milliTime();
-    //sw.printH();
+    sw.printH();
 
     val backtrackStart = Timer.nanoTime();
     val pair = sw.backtrackH(
