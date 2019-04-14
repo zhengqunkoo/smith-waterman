@@ -583,9 +583,9 @@ public class SmithWatermanPar {
     sw.fillW();
 
     sw.initH();
-    val fillStart = Timer.milliTime();
+    val fillStart = Timer.nanoTime();
     sw.fillH();
-    val fillStop = Timer.milliTime();
+    val fillStop = Timer.nanoTime();
     sw.printH();
 
     val backtrackStart = Timer.nanoTime();
