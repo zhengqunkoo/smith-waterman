@@ -509,6 +509,7 @@ public class SmithWatermanPar {
 
   def backtrackH(pair:Pair[StringBuilder, StringBuilder], i:Long, j:Long) {
     val cell = H(i, j);
+    H(i, j) = new Cell(-1, 0, 0);
     if (cell.score == 0) {
       return pair;
     }
@@ -586,7 +587,6 @@ public class SmithWatermanPar {
     val fillStart = Timer.nanoTime();
     sw.fillH();
     val fillStop = Timer.nanoTime();
-    sw.printH();
 
     val backtrackStart = Timer.nanoTime();
     val pair = sw.backtrackH(
@@ -596,6 +596,7 @@ public class SmithWatermanPar {
       sw.maxH.x,
       sw.maxH.y);
     val backtrackStop = Timer.nanoTime();
+    sw.printH();
     Console.OUT.printf("%s\n%s\n", pair.first, pair.second);
     Console.OUT.println("Timing (ns):");
     Console.OUT.printf("fill: %d\n", fillStop - fillStart);
