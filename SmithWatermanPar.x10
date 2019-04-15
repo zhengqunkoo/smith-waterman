@@ -262,8 +262,10 @@ public class SmithWatermanPar {
     }
 
     H(i, j) = new Cell(pair.first, x, y);
-    if (pair.first > maxH.score) {
-      maxH = new Cell(pair.first, i, j);
+    atomic{
+      if (pair.first > maxH.score) {
+        maxH = new Cell(pair.first, i, j);
+      }
     }
   }
   def initW() {

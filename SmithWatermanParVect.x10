@@ -559,7 +559,7 @@ public class SmithWatermanParVect {
       return;
     }
 
-    val sw = new SmithWatermanParTrans();
+    val sw = new SmithWatermanParVect();
 
     val frA = sw.skipFile(args(0), false);
     val frB = sw.skipFile(args(1), false);
