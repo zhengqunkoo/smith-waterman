@@ -181,7 +181,7 @@ class Vector {
 }
 
 
-public class SmithWatermanParTrans {
+public class SmithWatermanParVect {
   
   val VECTOR_SIZE = 8;
   var n:Long; // Length of a
@@ -280,7 +280,7 @@ public class SmithWatermanParTrans {
             fAboveZero = false;
 
             temp2.leftShift(1);
-            temp2 = temp2 - gapExt;
+            temp2.subtractLit(u);
             F.maxVector(F, temp2);
             
             for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){

@@ -7,13 +7,11 @@ import x10.io.ReaderIterator;
 import x10.util.Pair;
 import x10.util.StringBuilder;
 import x10.util.Timer;
-import x10.lang.Rail;
 
 /**
  * Amino acids do not include gap codon.
  * See https://www.mathworks.com/help/bioinfo/ref/aminolookup.html
  */
-
 
 class IntParser {
   val ri:ReaderIterator[String];
@@ -70,120 +68,7 @@ class CharParser {
   }
 }
 
-class Vector {
-  val VECTOR_SIZE = 8;
-  var v: Rail[Long]{self!=null};
-  public operator this(i:Long) = this.v(i);
-  public operator this(i:Long) = (newval: Long)
-  {
-    v(i) = newval;
-  }
-  public def this(i: Long){
-    v = new Rail[Long](VECTOR_SIZE);
-    for (var p: Long = 0; p < VECTOR_SIZE; p++)
-    {
-      v(p) = i;
-    }
-  }
-  public operator this() = (vec: Vector){
-    this.v = new Rail[Long](VECTOR_SIZE);
-    for (var p: Long = 0; p < VECTOR_SIZE; p++)
-    {
-      this.v(p) = vec(p);
-    }
-  }
-  public def this(vec: Rail[Long]){
-    this.v = new Rail[Long](VECTOR_SIZE);
-    for (var p: Long = 0; p < VECTOR_SIZE; p++)
-    {
-      this.v(p) = vec(p);
-    }
-  }
-  public operator this - (vect:Vector) = new Vector(new Rail[Long](
-    VECTOR_SIZE, (i:Long) => this.v(i) - vect.v(i)
-  ));
-  public operator this + (vect:Vector) = new Vector(new Rail[Long](
-    VECTOR_SIZE, (i:Long) => this.v(i) + vect.v(i)
-  ));
-  public def fill(i: Long){
-    for (var p: Long = 0; p < VECTOR_SIZE-1; p++)
-    {
-      v(p) = i;
-    }
-  }
-  public def copy(vec: Vector) {
-    for (var p: Long = 0; p < VECTOR_SIZE; p++)
-    {
-      this.v(p) = vec(p);
-    }
-  }
-
-  public def maxVector(vec1: Vector, vec2: Vector){
-    var highest: Long = this.v(0);
-    var index: Long = 0;
-    for (var p: Long = 0; p < VECTOR_SIZE; p++)
-    {
-      if (vec1(p) < vec2(p))
-        this.v(p) = vec2(p);
-      else
-        this.v(p) = vec1(p);
-
-      if (this.v(p) > highest)
-      {
-        highest = this.v(p);
-        index = p;
-      }
-        
-    }
-
-    return new Pair(index, highest);
-  }
-
-
-  public def subtractLit(i: Long){
-    for (var j: Long = 0n; j < VECTOR_SIZE; j++){
-      this.v(j) = this.v(j) - i;
-    }
-  }
-  public def addLit(i: Long){
-    for (var j: Long = 0n; j < VECTOR_SIZE; j++){
-      this.v(j) = this.v(j) + i;
-    }
-  }
-
-  public def rightShift(i: Long) {
-    for (var j: Long = 0n; j < i; j++)
-    {
-      rightShiftOne();
-    }
-  }
-  def rightShiftOne(){
-    for (var p: Long = 0; p < VECTOR_SIZE-2; p++)
-    {
-      v(p) = v(p+1);
-    }
-    v(VECTOR_SIZE-1) = 0;
-  }
-  public def leftShift(i: Long) {
-    for (var j: Long = 0n; j < i; j++)
-    {
-      leftShiftOne();
-    }
-    
-  }
-  def leftShiftOne(){
-    for (var p: Long = VECTOR_SIZE-1; p > 0; p--)
-    {
-      v(p) = v(p-1);
-    }
-    v(0) = 0;
-  }
-}
-
-
 public class SmithWatermanPar {
-  
-  val VECTOR_SIZE = 8;
   var n:Long; // Length of a
   var m:Long; // Length of b
   var a:String;
@@ -191,146 +76,17 @@ public class SmithWatermanPar {
   var u:Long; // Gap extension penalty
   var v:Long; // Gap opening penalty
   var alphabet:String; // Amino acids
-  var w:Rail[Long]{self!=null};
+  var w:Array_1[Long]{self!=null};
   var H:Array_2[Cell]{self!=null};
-  var HH:Rail[Vector];
-  var EE:Rail[Vector];
   var S:Array_2[Int]{self!=null};
   var maxH:Cell;
-  
 
   static struct Cell(score:Long, x:Long, y:Long) {}
 
-
-
-  def initH() {
-    val vectorCount = n / VECTOR_SIZE + 1;
-    EE = new Rail[Vector](vectorCount+1);
-    HH = new Rail[Vector](vectorCount+1);
-    H = new Array_2[Cell](m+1, n+1);
-
-  }
-
-  def fillH() {
-    var currentChar:Char;
-    val vectorCount = (n / VECTOR_SIZE);
-    var tempH: Vector = new Vector(0);
-    var tempE: Vector = new Vector(0);
-    var temp1: Vector = new Vector(0);
-    var temp2: Vector = new Vector(0);
-    var F: Vector = new Vector(0);
-    var tempF: Vector = new Vector(0);
-    var X: Vector = new Vector(0);
-    var zeroVect: Vector = new Vector(0);
-    var score: Vector = new Vector(0);
-    var strings: Rail[String] = new Rail[String](n);
-    
-    var gapOpen: Vector = new Vector(v);
-    var gapExt: Vector = new Vector(u);
-    
-    for (i in 0..vectorCount){
-      HH(i) = new Vector(0);
-      EE(i) = new Vector(0);
-    }
-    
-    for (var j: Long = 0; j < m; j++)
-    {
-      X.copy(zeroVect);
-      F.copy(zeroVect);
-      currentChar = b(j as Int); //Get next char from second sequence
-      
-      for (var i: Long = 0; i < vectorCount; i++)
-      {
-        
-        tempH.copy(HH(i));
-        tempE.copy(EE(i));
-
-        temp1(0) = tempH(7); //Save previous H(7)
-        tempH.leftShift(1);
-        tempH(0) = X(0); //Put old H[7] from last round in H-vector
-        X(0) = temp1(0); //save old H[7] for next round
-
-        for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++)
-        {
-          tempH(vInd) = (tempH(vInd) + 
-          S(alphabet.indexOf(a.charAt((i*VECTOR_SIZE+vInd) as Int)),
-            alphabet.indexOf(currentChar)
-          ));
-        }
-        tempH.maxVector(tempH, tempE);
-
-        tempF.copy(F);
-        F.copy(tempH);
-        F(0) = tempF(7);
-        F.subtractLit(u+v); //Subtract single gap penalty from F-vector
-
-        var fAboveZero: Boolean = false;
-        for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){
-          if (F(vInd) > 0)
-          {
-            fAboveZero = true;
-          }
-        }
-
-        if (fAboveZero)
-        {
-          temp2.copy(F);
-          while (fAboveZero)
-          {
-            fAboveZero = false;
-
-            temp2.leftShift(1);
-            temp2 = temp2 - gapExt;
-            F.maxVector(F, temp2);
-            
-            for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){
-              if (temp2(vInd) > 0)
-              {
-                fAboveZero = true;
-              }
-            }            
-          }
-
-          tempH.maxVector(tempH, F);
-          F.addLit(v);
-          F.maxVector(F, tempH); 
-        }
-        else{
-          F.copy(tempH);
-        }
-
-        tempH.maxVector(tempH, zeroVect);
-        
-
-        HH(i).copy(tempH);
-        EE(i).maxVector(tempH - gapOpen, tempE);
-        EE(i) = EE(i) - gapExt;
-
-        for (vInd in 0..7) {
-          val row: Long = i*VECTOR_SIZE+vInd;
-          H(j+1, row+1) = new Cell(tempH(vInd), j+1, row+1);
-        }
-        
-        val max = score.maxVector(tempH, score);
-        
-        if (max.second > maxH.score){
-          maxH = new Cell(max.second, j+1, i*VECTOR_SIZE+max.first+1);
-        }
-      }
-    }
-
-    Console.OUT.println("----3----");
-    for (vInd in 0..7) {
-      Console.OUT.printf("(%d)", score(vInd));
-    } 
-    Console.OUT.println("\n----3----");
-  }
-
-  
   public def this() {
     S = new Array_2[Int](0, 0);
     H = new Array_2[Cell](0, 0);
-    w = new Rail[Long](0);
+    w = new Array_1[Long](0);
     maxH = Cell(0, 0, 0);
   }
 
@@ -341,7 +97,7 @@ public class SmithWatermanPar {
       return j;
     }
   }
-  
+
   def maxFour(i:Long, j:Long, k:Long, l:Long) {
     var ind:Long = 0;
     val m1:Long = maxTwo(i, j);
@@ -362,8 +118,8 @@ public class SmithWatermanPar {
   }
 
   def printH() {
-    for (i in 0..m) {
-      for (j in 0..n) {
+    for (i in 0..n) {
+      for (j in 0..m) {
         Console.OUT.printf("(%d)", H(i, j).score);
       }
       Console.OUT.println();
@@ -379,37 +135,13 @@ public class SmithWatermanPar {
     }
   }
 
-  def parseSWithPadding(fr:FileReader) {
-    Console.OUT.println("LENGTH OF ALPHABET = " + alphabet.length());
-
-    S = new Array_2[Int](alphabet.length() + 1, alphabet.length() + 1);
+  def parseS(fr:FileReader) {
     val ip = new IntParser(fr);
     for (i in 0..(alphabet.length()-1)) {
       for (j in 0..(alphabet.length()-1)) {
         S(i, j) = ip.next();
       }
     }
-    var padding:Long = (a.length() % VECTOR_SIZE); //Pad data if a-sequence
-                                                   // Does not scale with vector size
-    if (padding != 0)
-    {
-      alphabet = alphabet + "0";
-      
-      for (i in 0..padding){
-        a = a + '0';
-      }
-
-      for (i in 0..(alphabet.length() -1))
-      {
-        S(alphabet.length()-1, i) = -2000n;
-        S(i, alphabet.length()-1) = -2000n;
-      }
-
-      n = a.length();
-    }
-
-    
-    Console.OUT.println("Length of n: " + n);
   }
 
   def parseSeq(fr:FileReader, isFirstSeq:Boolean) {
@@ -475,13 +207,70 @@ public class SmithWatermanPar {
     return fr;
   }
 
+  def initH() {
+    H = new Array_2[Cell](n+1, m+1);
+  }
 
+  def fillH() {
+    for (var i: Long = 1; i < n + m + 1; i++) {
+      finish{
+        for (var j: Long = 1; j < i; j++) {
+          val j2 = j;
+          val k = i - j2;
+          if (k <= n && j2 <= m)
+          {
+            async
+            {
+              calculateWeight(k, j2);
+            }
+          }
+        }
+      }
+    }
+    Console.OUT.println("----3----");
+    Console.OUT.println("----3----");
+  }
 
+  def calculateWeight(i: Long, j: Long) {
+    var maxK:Long = 0;
+    for (k in 1..(i-1)) {
+      maxK = maxTwo(maxK, H(k, j).score-w(i-k));
+    }
+    var maxL:Long = 0;
+    for (l in 1..(j-1)) {
+      maxL = maxTwo(maxL, H(i, l).score-w(j-l));
+    }
+
+    val pair = maxFour(H(i-1, j-1).score + S(
+        alphabet.indexOf(a.charAt((i-1) as Int)),
+        alphabet.indexOf(b.charAt((j-1) as Int))),
+      maxK,
+      maxL,
+      0);
+
+    var x:Long = 0;
+    var y:Long = 0;
+    if (pair.second == 0) {
+      x = i-1;
+      y = j-1;
+    } else if (pair.second == 1) {
+      x = i-1;
+      y = j;
+    } else if (pair.second == 2) {
+      x = i;
+      y = j-1;
+    }
+
+    H(i, j) = new Cell(pair.first, x, y);
+    if (pair.first > maxH.score) {
+      maxH = new Cell(pair.first, i, j);
+    }
+  }
   def initW() {
     if (n > m) {
-      w = new Rail[Long](n+1);
+      w = new Array_1[Long](n+1);
     } else {
-      w = new Rail[Long](m+1);
+      w = new Array_1[Long](m+1);
     }
   }
 
@@ -491,56 +280,26 @@ public class SmithWatermanPar {
     }
   }
 
-  def maxThree(a: Long, b: Long, c: Long) : Long
-  {
-    val m1: Long = maxTwo(a, b);
-    val m2: Long = maxTwo(m1, c);
-
-    if (m2 == a)
-      return 0;
-    else if (m2 == b)
-      return 1;
-    else
-      return 2;
-
-  }
-
-
-
   def backtrackH(pair:Pair[StringBuilder, StringBuilder], i:Long, j:Long) {
     val cell = H(i, j);
     if (cell.score == 0) {
       return pair;
     }
 
-    val c1 = H(i-1, j-1);
-    val c2 = H(i-1, j);
-    val c3 = H(i, j-1);
-    
-    var k: Long = i-1;
-    var l: Long = j-1;
-    val maxInd = maxThree(c1.score, c2.score, c3.score);
-    if (maxInd == 1)
-    {
-      l = j;
-    }
-    else if (maxInd == 2)
-    {
-      k = i;
-    }
-
+    val k = cell.x;
+    val l = cell.y;
     var sb1:StringBuilder = new StringBuilder();
     var sb2:StringBuilder = new StringBuilder();
 
     if (i-k != 1) {
       sb1 = pair.first.add('-');
     } else {
-      sb1 = pair.first.add(b.charAt(k as Int));
+      sb1 = pair.first.add(a.charAt(k as Int));
     }
     if (j-l != 1) {
       sb2 = pair.second.add('-');
     } else {
-      sb2 = pair.second.add(a.charAt(l as Int));
+      sb2 = pair.second.add(b.charAt(l as Int));
     }
 
     return backtrackH(new Pair[StringBuilder, StringBuilder](sb1, sb2),
@@ -548,9 +307,13 @@ public class SmithWatermanPar {
       l);
   }
 
+  def initS() {
+    S = new Array_2[Int](alphabet.length(), alphabet.length());
+  }
+
   public static def main(args:Rail[String]):void {
     if (args.size != 5) {
-      Console.OUT.println("Usage: SmithWaterman
+      Console.OUT.println("Usage: SmithWatermanPar
         fileSeqA
         fileSeqB
         fileSubst
@@ -575,17 +338,17 @@ public class SmithWatermanPar {
     Console.OUT.println(sw.m);
     Console.OUT.println(sw.b);
 
-    sw.parseSWithPadding(frS);
+
+    sw.initS();
+    sw.parseS(frS);
     sw.printS();
-
-
     sw.initW();
     sw.fillW();
 
     sw.initH();
-    val fillStart = Timer.nanoTime();
+    val fillStart = Timer.milliTime();
     sw.fillH();
-    val fillStop = Timer.nanoTime();
+    val fillStop = Timer.milliTime();
     sw.printH();
 
     val backtrackStart = Timer.nanoTime();
@@ -600,9 +363,10 @@ public class SmithWatermanPar {
     Console.OUT.println("Timing (ns):");
     Console.OUT.printf("fill: %d\n", fillStop - fillStart);
     Console.OUT.printf("backtrack: %d\n", backtrackStop - backtrackStart);
-
+    Console.OUT.printf("maxH: %d\n", sw.maxH.score);
     frA.close();
     frB.close();
     frS.close();
   }
 }
+
