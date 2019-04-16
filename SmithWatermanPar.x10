@@ -375,6 +375,30 @@ public class SmithWatermanPar {
     S = new Array_2[Int](alphabet.length(), alphabet.length());
   }
 
+  // Reverse a string builder.
+  // Defining this as a standalone function avoids affecting performance time,
+  // Since we can call this function outside of timed code.
+  def reverse(sb:StringBuilder):StringBuilder {
+    val sbNew:StringBuilder = new StringBuilder();
+
+    // First convert string builder into a rail.
+    // Then swap the elements of the rail.
+    // Define a temporary buffer to perform the swap.
+    val r:Rail[Char] = sb.result().chars();
+    val n:Long = sb.length()-1;
+    var tmp:Char;
+    for (val i in (0..(n/2))) {
+      tmp = r(i);
+      r(i) = r(n-i);
+      r(n-i) = tmp;
+    }
+    for (val c:Char in r) {
+      sbNew.add(c);
+    }
+    return sbNew;
+  }
+
+  // Program entry point with @param args like in the usage prompt.
   public static def main(args:Rail[String]):void {
 
     // Usage prompt.
@@ -432,7 +456,8 @@ public class SmithWatermanPar {
     val backtrackStop = Timer.nanoTime();
 
     // Print alignment results and time values.
-    Console.OUT.printf("%s\n%s\n", pair.first, pair.second);
+    Console.OUT.printf("%s\n%s\n", sw.reverse(pair.first),
+      sw.reverse(pair.second));
     Console.OUT.println("Timing (ns):");
     Console.OUT.printf("fill: %d\n", fillStop - fillStart);
     Console.OUT.printf("backtrack: %d\n", backtrackStop - backtrackStart);
