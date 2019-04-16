@@ -111,6 +111,69 @@ public class SmithWaterman {
   // A cell is an element of a matrix.
   static struct Cell(score:Long, x:Long, y:Long) {}
 
+
+
+  // Initialize cells of the H matrix.
+  def initH() {
+    H = new Array_2[Cell](n+1, m+1);
+  }
+
+  // Fill in each cell of H.
+  def fillH() {
+    for (i in 1..n) {
+      for (j in 1..m) {
+        // Get maximum score of cells in same column with penalties, @var maxK.
+        // Get maximum score of cells in same row with penalties, @var maxL.
+        var maxK:Long = 0;
+        for (k in 1..(i-1)) {
+          maxK = maxTwo(maxK, H(k, j).score-w(i-k));
+        }
+        var maxL:Long = 0;
+        for (l in 1..(j-1)) {
+          maxL = maxTwo(maxL, H(i, l).score-w(j-l));
+        }
+
+        // Get the cell with maximum score: either
+        // 1) Diagonal neighbor, score is diag neighbor's score plus S matrix.
+        // 2) Column neighbor, score maxK.
+        // 3) Row neighbor, score maxL.
+        // 4) current, score 0.
+        val pair = maxFour(H(i-1, j-1).score + S(
+            alphabet.indexOf(a.charAt((i-1) as Int)),
+            alphabet.indexOf(b.charAt((j-1) as Int))),
+          maxK,
+          maxL,
+          0);
+
+        // Store coordinates of the largest scoring neighbor in (x, y).
+        var x:Long = 0;
+        var y:Long = 0;
+        if (pair.second == 0) {
+          x = i-1;
+          y = j-1;
+        } else if (pair.second == 1) {
+          x = i-1;
+          y = j;
+        } else if (pair.second == 2) {
+          x = i;
+          y = j-1;
+        }
+
+        // Store cell with maximum score, and coordinates of largest scoring
+        // neighbor, in H matrix.
+        // Update maxH cell if score of this cell exceeds that of maxH.
+        H(i, j) = new Cell(pair.first, x, y);
+        if (pair.first > maxH.score) {
+          maxH = new Cell(pair.first, i, j);
+        }
+      }
+    }
+
+    Console.OUT.println("----3----");
+    Console.OUT.println("\n----3----");
+  }
+
+
   public def this() {
     S = new Array_2[Int](0, 0);
     H = new Array_2[Cell](0, 0);
@@ -255,65 +318,6 @@ public class SmithWaterman {
       alphabet = sb.toString();
     }
     return fr;
-  }
-
-  // Initialize cells of the H matrix.
-  def initH() {
-    H = new Array_2[Cell](n+1, m+1);
-  }
-
-  // Fill in each cell of H.
-  def fillH() {
-    for (i in 1..n) {
-      for (j in 1..m) {
-        // Get maximum score of cells in same column with penalties, @var maxK.
-        // Get maximum score of cells in same row with penalties, @var maxL.
-        var maxK:Long = 0;
-        for (k in 1..(i-1)) {
-          maxK = maxTwo(maxK, H(k, j).score-w(i-k));
-        }
-        var maxL:Long = 0;
-        for (l in 1..(j-1)) {
-          maxL = maxTwo(maxL, H(i, l).score-w(j-l));
-        }
-
-        // Get the cell with maximum score: either
-        // 1) Diagonal neighbor, score is diag neighbor's score plus S matrix.
-        // 2) Column neighbor, score maxK.
-        // 3) Row neighbor, score maxL.
-        // 4) current, score 0.
-        val pair = maxFour(H(i-1, j-1).score + S(
-            alphabet.indexOf(a.charAt((i-1) as Int)),
-            alphabet.indexOf(b.charAt((j-1) as Int))),
-          maxK,
-          maxL,
-          0);
-
-        // Store coordinates of the largest scoring neighbor in (x, y).
-        var x:Long = 0;
-        var y:Long = 0;
-        if (pair.second == 0) {
-          x = i-1;
-          y = j-1;
-        } else if (pair.second == 1) {
-          x = i-1;
-          y = j;
-        } else if (pair.second == 2) {
-          x = i;
-          y = j-1;
-        }
-
-        // Store cell with maximum score, and coordinates of largest scoring
-        // neighbor, in H matrix.
-        // Update maxH cell if score of this cell exceeds that of maxH.
-        H(i, j) = new Cell(pair.first, x, y);
-        if (pair.first > maxH.score) {
-          maxH = new Cell(pair.first, i, j);
-        }
-      }
-    }
-    Console.OUT.println("----3----");
-    Console.OUT.println("----3----");
   }
 
   // Initialize @var w with the larger of two matrix dimensions.
