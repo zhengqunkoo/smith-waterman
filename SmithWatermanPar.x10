@@ -370,7 +370,7 @@ public class SmithWatermanPar {
       l);
   }
 
-  // Program entry point with @param args like in the usage prompt.
+  // S is of dimension alphabet.length by alphabet.length.
   def initS() {
     S = new Array_2[Int](alphabet.length(), alphabet.length());
   }
