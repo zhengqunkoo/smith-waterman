@@ -20,8 +20,9 @@ Length of n: 8
 (0)(0)(0)(0)(3)(2)(6)(13)(11)(9)
 (0)(3)(3)(1)(1)(6)(4)(9)(10)(8)
 (0)(3)(6)(4)(2)(4)(3)(7)(6)(7)
-CA-TT-G
-CAGTTGG
+G-TT-AC
+GGTTGAC
 Timing (ns):
-fill: 98494
-backtrack: 3360
+fill: 0
+backtrack: 3720
+maxH: 13

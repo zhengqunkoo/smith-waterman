@@ -7,7 +7,6 @@ GGTTGACTA
 -3 -3 3 -3 
 -3 -3 -3 3 
 ----3----
-
 ----3----
 (0)(0)(0)(0)(0)(0)(0)(0)(0)(0)
 (0)(0)(0)(3)(3)(1)(0)(0)(3)(1)
@@ -21,6 +20,6 @@ GGTTGACTA
 GTT-AC
 GTTGAC
 Timing (ns):
-fill: 0
-backtrack: 4487
+fill: 1
+backtrack: 3104
 maxH: 13
