@@ -423,9 +423,9 @@ public class SmithWaterman {
 
     // Time filling H and backtracking across H.
     sw.initH();
-    val fillStart = Timer.nanoTime();
+    val fillStart = Timer.milliTime();
     sw.fillH();
-    val fillStop = Timer.nanoTime();
+    val fillStop = Timer.milliTime();
     sw.printH();
 
     val backtrackStart = Timer.nanoTime();

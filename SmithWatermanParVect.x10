@@ -207,7 +207,7 @@ class Vector {
  * Smith-Waterman algorithm.
  */
 public class SmithWatermanParVect {
-  
+
   val VECTOR_SIZE = 8;
   var n:Long; // Length of a
   var m:Long; // Length of b
@@ -653,9 +653,9 @@ public class SmithWatermanParVect {
 
     // Time filling H and backtracking across H.
     sw.initH();
-    val fillStart = Timer.nanoTime();
+    val fillStart = Timer.milliTime();
     sw.fillH();
-    val fillStop = Timer.nanoTime();
+    val fillStop = Timer.milliTime();
     sw.printH();
 
     val backtrackStart = Timer.nanoTime();
