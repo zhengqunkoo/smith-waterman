@@ -92,14 +92,18 @@ class CharParser {
   }
 }
 
+// Base vector class
+// Contains methods and fields for vectorized operations
 class Vector {
   val VECTOR_SIZE = 8;
-  var v: Rail[Long]{self!=null};
-  public operator this(i:Long) = this.v(i);
-  public operator this(i:Long) = (newval: Long)
+  var v: Rail[Long]{self!=null};                // Contains vector values
+  public operator this(i:Long) = this.v(i);     // Vector element accessor
+  public operator this(i:Long) = (newval: Long) // Vector element assignment accessor
   {
     v(i) = newval;
   }
+
+  // Literal constructor
   public def this(i: Long){
     v = new Rail[Long](VECTOR_SIZE);
     for (var p: Long = 0; p < VECTOR_SIZE; p++)
@@ -107,13 +111,8 @@ class Vector {
       v(p) = i;
     }
   }
-  public operator this() = (vec: Vector){
-    this.v = new Rail[Long](VECTOR_SIZE);
-    for (var p: Long = 0; p < VECTOR_SIZE; p++)
-    {
-      this.v(p) = vec(p);
-    }
-  }
+
+  // Copy constructor
   public def this(vec: Rail[Long]){
     this.v = new Rail[Long](VECTOR_SIZE);
     for (var p: Long = 0; p < VECTOR_SIZE; p++)
@@ -121,18 +120,21 @@ class Vector {
       this.v(p) = vec(p);
     }
   }
+
+  // Subtraction operator
+  // Returns newly allocated vector
   public operator this - (vect:Vector) = new Vector(new Rail[Long](
     VECTOR_SIZE, (i:Long) => this.v(i) - vect.v(i)
   ));
+
+  // Addition operator
+  // Returns newly allocated vector
   public operator this + (vect:Vector) = new Vector(new Rail[Long](
     VECTOR_SIZE, (i:Long) => this.v(i) + vect.v(i)
   ));
-  public def fill(i: Long){
-    for (var p: Long = 0; p < VECTOR_SIZE-1; p++)
-    {
-      v(p) = i;
-    }
-  }
+
+  //Element-wise copy all elements of @vec to this 
+  // Used instead of assignment operator
   public def copy(vec: Vector) {
     for (var p: Long = 0; p < VECTOR_SIZE; p++)
     {
@@ -140,6 +142,9 @@ class Vector {
     }
   }
 
+  // Compares each element of @vec1 and @vec2
+  // Stores highest element in this vector
+  // Returns pair containing index of highest value and highest value respectively
   public def maxVector(vec1: Vector, vec2: Vector){
     var highest: Long = this.v(0);
     var index: Long = 0;
@@ -161,24 +166,29 @@ class Vector {
     return new Pair(index, highest);
   }
 
-
+  // Subtract each element of vector with literal
   public def subtractLit(i: Long){
     for (var j: Long = 0n; j < VECTOR_SIZE; j++){
       this.v(j) = this.v(j) - i;
     }
   }
+
+  // Add literal to each element
   public def addLit(i: Long){
     for (var j: Long = 0n; j < VECTOR_SIZE; j++){
       this.v(j) = this.v(j) + i;
     }
   }
 
+  // Shift elements in vector by @param i steps to the right
   public def rightShift(i: Long) {
     for (var j: Long = 0n; j < i; j++)
     {
       rightShiftOne();
     }
   }
+
+  //Shift elements in vector to the right by one
   def rightShiftOne(){
     for (var p: Long = 0; p < VECTOR_SIZE-2; p++)
     {
@@ -186,6 +196,8 @@ class Vector {
     }
     v(VECTOR_SIZE-1) = 0;
   }
+
+  // Shift elements in vector by @param i steps to the left
   public def leftShift(i: Long) {
     for (var j: Long = 0n; j < i; j++)
     {
@@ -193,6 +205,8 @@ class Vector {
     }
 
   }
+
+  //Shift elements in vector to the left by one
   def leftShiftOne(){
     for (var p: Long = VECTOR_SIZE-1; p > 0; p--)
     {
@@ -216,7 +230,6 @@ public class SmithWatermanParVect {
   var u:Long; // Gap extension penalty
   var v:Long; // Gap opening penalty
   var alphabet:String; // Amino acids
-  var w:Rail[Long]{self!=null};
   var H:Array_2[Cell]{self!=null};
   var HH:Rail[Vector];
   var EE:Rail[Vector];
@@ -237,46 +250,52 @@ public class SmithWatermanParVect {
 
   }
 
-  // Fill in each cell of H.
+  // Fill in each cell of H using Rognes' Smith-Waterman algorithm.
   def fillH() {
-    var currentChar:Char;
-    val vectorCount = (n / VECTOR_SIZE);
-    var tempH: Vector = new Vector(0);
-    var tempE: Vector = new Vector(0);
-    var temp1: Vector = new Vector(0);
-    var temp2: Vector = new Vector(0);
-    var F: Vector = new Vector(0);
-    var tempF: Vector = new Vector(0);
-    var X: Vector = new Vector(0);
-    var zeroVect: Vector = new Vector(0);
-    var score: Vector = new Vector(0);
-    var strings: Rail[String] = new Rail[String](n);
+    //Initialize temporary varibles for algorithm
+    var currentChar:Char; //Current character in second sequence to work on
+    val vectorCount = (n / VECTOR_SIZE);  // Amount of vectors to cover padded first sequence
+    var tempH: Vector = new Vector(0);    // Working vector for filling H-matrix
+    var tempE: Vector = new Vector(0);    // Working vector for calulating horizontal gap penalty
+    var temp1: Vector = new Vector(0);    // Working vector for storing last element from previous vector
+    var temp2: Vector = new Vector(0);    // Working vector for calculating vertical gap penalty
+    var F: Vector = new Vector(0);        // Vector for storing vertical gap penalty
+    var tempF: Vector = new Vector(0);    // Temporary register for storing vertical gap penalty
+    var X: Vector = new Vector(0);        // Working vector for storing last element of previous vector
+    var zeroVect: Vector = new Vector(0); // Default zero vector used for zero-initialization
+    var score: Vector = new Vector(0);    // Vector for storing highest score
 
+    //Default vectors containing gap penalty variables
     var gapOpen: Vector = new Vector(v);
     var gapExt: Vector = new Vector(u);
 
     for (i in 0..vectorCount){
+      //Zero initialize HH and EE matrices
       HH(i) = new Vector(0);
       EE(i) = new Vector(0);
     }
 
     for (var j: Long = 0; j < m; j++)
     {
+      //Set X and F registers to zero
       X.copy(zeroVect);
       F.copy(zeroVect);
+
       currentChar = b(j as Int); //Get next char from second sequence
 
       for (var i: Long = 0; i < vectorCount; i++)
       {
-
+        //Copy H and E registers from previous column to temporary registers
         tempH.copy(HH(i));
         tempE.copy(EE(i));
 
         temp1(0) = tempH(7); //Save previous H(7)
-        tempH.leftShift(1);
+        tempH.leftShift(1); //Shift working H-register to make room for old H[7]
         tempH(0) = X(0); //Put old H[7] from last round in H-vector
-        X(0) = temp1(0); //save old H[7] for next round
+        X(0) = temp1(0); //save new H[7] for next round
 
+        // Get score of each H[i - 1, j - 1] value and 
+        // add substitution matrix value from S-matrix
         for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++)
         {
           tempH(vInd) = (tempH(vInd) +
@@ -284,13 +303,17 @@ public class SmithWatermanParVect {
             alphabet.indexOf(currentChar)
           ));
         }
+
+        //Find highest value between horizontal element with gap penalty
+        //Or upper diagonal element value
         tempH.maxVector(tempH, tempE);
 
-        tempF.copy(F);
-        F.copy(tempH);
-        F(0) = tempF(7);
+        tempF.copy(F);      // Store F-vector in temporary vector
+        F.copy(tempH);      // Copy H-values to F-vector
+        F(0) = tempF(7);    // Set new F(0) to old F(7) element
         F.subtractLit(u+v); //Subtract single gap penalty from F-vector
 
+        //Check if any value in F-vector is above zero
         var fAboveZero: Boolean = false;
         for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){
           if (F(vInd) > 0)
@@ -299,45 +322,49 @@ public class SmithWatermanParVect {
           }
         }
 
+        //If F-vector has value above zero, calculate vertical gap penalty
         if (fAboveZero)
         {
-          temp2.copy(F);
-          while (fAboveZero)
-          {
-            fAboveZero = false;
+          temp2.copy(F); //Copy F-vector into temporary working register
 
-            temp2.leftShift(1);
-            temp2.subtractLit(u);
-            F.maxVector(F, temp2);
+          while (fAboveZero) //While any element in temp2 is above zero
+          {
+            fAboveZero = false; // Default boolean for checking if F contains element above zero
+
+            temp2.leftShift(1);    // Shift temp register by one
+            temp2.subtractLit(u);  // Subtract gap extension penalty
+            F.maxVector(F, temp2); // Update F is score is higher after subtraction
 
             for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){
               if (temp2(vInd) > 0)
               {
-                fAboveZero = true;
+                fAboveZero = true; // If any value is still above 0, set to true
               }
             }
           }
 
-          tempH.maxVector(tempH, F);
-          F.addLit(v);
-          F.maxVector(F, tempH);
+          tempH.maxVector(tempH, F); //Find highest value between vertical and upper diagonal cells
+          F.addLit(v); // Add gap opening penalty to F
+          F.maxVector(F, tempH); //Check if H or F is higher for all elements
         }
         else{
-          F.copy(tempH);
+          F.copy(tempH); //Otherwise update F for use in next round
         }
 
-        tempH.maxVector(tempH, zeroVect);
+        tempH.maxVector(tempH, zeroVect); //Find hihgest value between H and zero
 
 
-        HH(i).copy(tempH);
-        EE(i).maxVector(tempH - gapOpen, tempE);
-        EE(i) = EE(i) - gapExt;
+        HH(i).copy(tempH);                       // Copy tempH value for next column
+        EE(i).maxVector(tempH - gapOpen, tempE); // Find highest value between tempH and horizontal value
+        EE(i).subtractLit(u);                    // Subtract gap extension
 
+        // Save elements in H-matrix
         for (vInd in 0..7) {
           val row: Long = i*VECTOR_SIZE+vInd;
           H(row+1, j+1) = new Cell(tempH(vInd), j+1, row+1);
         }
 
+        //Find highest value found so far
         val max = score.maxVector(tempH, score);
 
         // Update maxH cell if score of this cell exceeds that of maxH.
@@ -347,6 +374,7 @@ public class SmithWatermanParVect {
       }
     }
 
+    //Print highest found values
     Console.OUT.println("----3----");
     for (vInd in 0..7) {
       Console.OUT.printf("(%d)", score(vInd));
@@ -354,42 +382,11 @@ public class SmithWatermanParVect {
     Console.OUT.println("\n----3----");
   }
 
-
+  //Public constructor, zero initialize variables
   public def this() {
     S = new Array_2[Int](0, 0);
     H = new Array_2[Cell](0, 0);
-    w = new Rail[Long](0);
     maxH = Cell(0, 0, 0);
-  }
-
-  // Return highest long of two longs, i and j.
-  def maxTwo(i:Long, j:Long) {
-    if (i > j) {
-      return i;
-    } else {
-      return j;
-    }
-  }
-
-  // If [i, j, k, l] were in an array,
-  // Return highest long, and index of that highest long in that array.
-  def maxFour(i:Long, j:Long, k:Long, l:Long) {
-    var ind:Long = 0;
-    val m1:Long = maxTwo(i, j);
-    val m2:Long = maxTwo(k, l);
-    var m3:Long = maxTwo(m1, m2);
-
-    if (i == m3) {
-      ind = 0;
-    } else if (j == m3) {
-      ind = 1;
-    } else if (k == m3) {
-      ind = 2;
-    } else if (l == m3) {
-      ind = 3;
-    }
-
-    return new Pair(m3, ind);
   }
 
   // Print cells of the H matrix.
@@ -414,6 +411,7 @@ public class SmithWatermanParVect {
 
   // Read integers from file reader @param fr into the S matrix.
   // S is of dimension alphabet.length by alphabet.length.
+  // Also pads first sequnce until it is divisible by vector size
   def parseSWithPadding(fr:FileReader) {
     Console.OUT.println("LENGTH OF ALPHABET = " + alphabet.length());
 
@@ -434,6 +432,8 @@ public class SmithWatermanParVect {
         a = a + '0';
       }
 
+      // Add large negative value to padding character in substitution matrix
+      // To avoid padding characters affecting alignment result
       for (i in 0..(alphabet.length() -1))
       {
         S(alphabet.length()-1, i) = -2000n;
@@ -525,22 +525,7 @@ public class SmithWatermanParVect {
     return fr;
   }
 
-  // Initialize @var w with the larger of two matrix dimensions.
-  def initW() {
-    if (n > m) {
-      w = new Rail[Long](n+1);
-    } else {
-      w = new Rail[Long](m+1);
-    }
-  }
-
-  // Fill @var w with a linear value.
-  def fillW() {
-    for (i in 1..(w.size-1)) {
-      w(i) = u*i+v;
-    }
-  }
-
+  //Finds highest value of three integers and returns index of highest
   def maxThree(a: Long, b: Long, c: Long) : Long
   {
     val m1: Long = maxTwo(a, b);
@@ -555,7 +540,14 @@ public class SmithWatermanParVect {
 
   }
 
-
+  // Return highest long of two longs, i and j.
+  def maxTwo(i:Long, j:Long) {
+    if (i > j) {
+      return i;
+    } else {
+      return j;
+    }
+  }
 
   // Backtrack through the H matrix, starting from cell (@param i, j).
   // And storing the character corresponding to each cell in @var sb1, sb2.
@@ -669,10 +661,6 @@ public class SmithWatermanParVect {
     // Initialize, fill, and print matrices.
     sw.parseSWithPadding(frS);
     sw.printS();
-
-
-    sw.initW();
-    sw.fillW();
 
     // Time filling H and backtracking across H.
     sw.initH();

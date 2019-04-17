@@ -257,22 +257,25 @@ public class SmithWatermanPar {
     return fr;
   }
 
-  // Initialize @var w with the larger of two matrix dimensions.
+  // Initialize @var H with sequence length size
   def initH() {
     H = new Array_2[Cell](n+1, m+1);
   }
 
+  // Fill alignment (H) matrix
+  // Using anti-diagonal (diagnal propagation) parallel algorithm
   def fillH() {
+    // For each anti-diagonal in H
     for (var i: Long = 1; i < n + m + 1; i++) {
-      finish{
+      finish{ //Wait for anti-diagonal to finish before starting the next
         for (var j: Long = 1; j < i; j++) {
-          val j2 = j;
-          val k = i - j2;
+          val j2 = j; //Temporary value for H-column to allow for async call
+          val k = i - j2; //Get matrix element on diagonal
           if (k <= n && j2 <= m)
           {
             async
             {
-              calculateWeight(k, j2);
+              calculateWeight(k, j2); //Calculate weight for cell
             }
           }
         }
@@ -282,16 +285,21 @@ public class SmithWatermanPar {
     Console.OUT.println("----3----");
   }
 
+  // Calculates weight of cell in H[i,j] using Smith-Waterman
   def calculateWeight(i: Long, j: Long) {
+    // Determine Weight of horizontal elements minus gap penalty
     var maxK:Long = 0;
     for (k in 1..(i-1)) {
       maxK = maxTwo(maxK, H(k, j).score-w(i-k));
     }
+
+    // Determine weight of vertical elements minus gap penalty
     var maxL:Long = 0;
     for (l in 1..(j-1)) {
       maxL = maxTwo(maxL, H(i, l).score-w(j-l));
     }
 
+    // Find highest value of the four possible weights
     val pair = maxFour(H(i-1, j-1).score + S(
         alphabet.indexOf(a.charAt((i-1) as Int)),
         alphabet.indexOf(b.charAt((j-1) as Int))),
@@ -299,6 +307,7 @@ public class SmithWatermanPar {
       maxL,
       0);
 
+    // Store reference to the highest valued cell for backtracking
     var x:Long = 0;
     var y:Long = 0;
     if (pair.second == 0) {
@@ -312,6 +321,7 @@ public class SmithWatermanPar {
       y = j-1;
     }
 
+    // Add cell to H-matrix, if cell is highest value so far, save for backtracking
     H(i, j) = new Cell(pair.first, x, y);
     atomic{
       if (pair.first > maxH.score) {
@@ -319,6 +329,8 @@ public class SmithWatermanPar {
       }
     }
   }
+
+  // Initialize @var w with the larger of two matrix dimensions.
   def initW() {
     if (n > m) {
       w = new Array_1[Long](n+1);
