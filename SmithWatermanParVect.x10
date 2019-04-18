@@ -253,45 +253,49 @@ public class SmithWatermanParVect {
   // Fill in each cell of H using Rognes' Smith-Waterman algorithm.
   def fillH() {
     //Initialize temporary varibles for algorithm
-    var currentChar:Char;                //One database sequence symbol (c)
-    val vectorCount = (n / VECTOR_SIZE);  //Vectors (H, X, E, F, T1, T2) and Array (HH, EE)
-    var tempH: Vector = new Vector(0);   
-    var tempE: Vector = new Vector(0);   
-    var temp1: Vector = new Vector(0);    
-    var temp2: Vector = new Vector(0);   
-    var F: Vector = new Vector(0);       
-    var tempF: Vector = new Vector(0);    
-    var X: Vector = new Vector(0);       
-    var zeroVect: Vector = new Vector(0); 
-    var score: Vector = new Vector(0);   
+    var currentChar:Char; //Current character in second sequence to work on
+    val vectorCount = (n / VECTOR_SIZE);  // Amount of vectors to cover padded first sequence
+    var tempH: Vector = new Vector(0);    // Working vector for filling H-matrix
+    var tempE: Vector = new Vector(0);    // Working vector for calulating horizontal gap penalty
+    var temp1: Vector = new Vector(0);    // Working vector for storing last element from previous vector
+    var temp2: Vector = new Vector(0);    // Working vector for calculating vertical gap penalty
+    var F: Vector = new Vector(0);        // Vector for storing vertical gap penalty
+    var tempF: Vector = new Vector(0);    // Temporary register for storing vertical gap penalty
+    var X: Vector = new Vector(0);        // Working vector for storing last element of previous vector
+    var zeroVect: Vector = new Vector(0); // Default zero vector used for zero-initialization
+    var score: Vector = new Vector(0);    // Vector for storing highest score
 
     //Default vectors containing gap penalty variables
-    var gapOpen: Vector = new Vector(v);  //Gap open penalty vector (Vector.subtractLit(v) is used instead)
-    var gapExt: Vector = new Vector(u);   //Gap extension penalty (Vector.subtractLit(u) is used instead)
+    var gapOpen: Vector = new Vector(v);
+    var gapExt: Vector = new Vector(u);
 
     for (i in 0..vectorCount){
-      HH(i) = new Vector(0); //Initialize HH-array of H-values from previous column
-      EE(i) = new Vector(0); // Initialize EE-array of E-values from previous column
+      //Zero initialize HH and EE matrices
+      HH(i) = new Vector(0);
+      EE(i) = new Vector(0);
     }
 
-    for (var j: Long = 0; j < m; j++) //For each symbol in the DB sequence
+    for (var j: Long = 0; j < m; j++)
     {
-      X.copy(zeroVect); //Initialize X-vector for 1. round
-      F.copy(zeroVect); //Initialize F-vector for 1. round
+      //Set X and F registers to zero
+      X.copy(zeroVect);
+      F.copy(zeroVect);
 
-      currentChar = b(j as Int); //Get one database symbol
+      currentChar = b(j as Int); //Get next char from second sequence
 
-      for (var i: Long = 0; i < vectorCount; i++) // For each vector of 8 matrix cells along query sequence
+      for (var i: Long = 0; i < vectorCount; i++)
       {
-        tempH.copy(HH(i)); // Load previous H-vector from HH-array
-        tempE.copy(EE(i)); // Load previous E-vector from EE-array
+        //Copy H and E registers from previous column to temporary registers
+        tempH.copy(HH(i));
+        tempE.copy(EE(i));
 
-        temp1(0) = tempH(7);// Save previous H[7] for use below
-        tempH.leftShift(1); // Shift H-vector and OR with H[7] from previous round
-        tempH(0) = X(0);    // Shift H-vector and OR with H[7] from previous round
-        X(0) = temp1(0);    //save old H[7] in X for next round
+        temp1(0) = tempH(7); //Save previous H(7)
+        tempH.leftShift(1); //Shift working H-register to make room for old H[7]
+        tempH(0) = X(0); //Put old H[7] from last round in H-vector
+        X(0) = temp1(0); //save new H[7] for next round
 
-        // Add score profile vector to H (and subtract base)
+        // Get score of each H[i - 1, j - 1] value and 
+        // add substitution matrix value from S-matrix
         for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++)
         {
           tempH(vInd) = (tempH(vInd) +
@@ -300,14 +304,16 @@ public class SmithWatermanParVect {
           ));
         }
 
-        tempH.maxVector(tempH, tempE); //Check if score with database gap is better
+        //Find highest value between horizontal element with gap penalty
+        //Or upper diagonal element value
+        tempH.maxVector(tempH, tempE);
 
-        tempF.copy(F);      // Calculate initial F-vector by shifting H and previous F
-        F.copy(tempH);      // Calculate initial F-vector by shifting H and previous F
-        F(0) = tempF(7);    // Calculate initial F-vector by shifting H and previous F
-        F.subtractLit(u+v); //Subtract single gap penalty
+        tempF.copy(F);      // Store F-vector in temporary vector
+        F.copy(tempH);      // Copy H-values to F-vector
+        F(0) = tempF(7);    // Set new F(0) to old F(7) element
+        F.subtractLit(u+v); //Subtract single gap penalty from F-vector
 
-        //Check if vertical gaps are possible
+        //Check if any value in F-vector is above zero
         var fAboveZero: Boolean = false;
         for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){
           if (F(vInd) > 0)
@@ -316,18 +322,18 @@ public class SmithWatermanParVect {
           }
         }
 
-
-        if (fAboveZero) // Compute correct F-vector if necessary
+        //If F-vector has value above zero, calculate vertical gap penalty
+        if (fAboveZero)
         {
-          temp2.copy(F); //T2 is initial F-vector
+          temp2.copy(F); //Copy F-vector into temporary working register
 
-          while (fAboveZero) //Repeat while any element of T2 is nonzero
+          while (fAboveZero) //While any element in temp2 is above zero
           {
-            fAboveZero = false;
+            fAboveZero = false; // Default boolean for checking if F contains element above zero
 
-            temp2.leftShift(1);    // Shift and subtract gap extension penalty
-            temp2.subtractLit(u);  // Shift and subtract gap extension penalty
-            F.maxVector(F, temp2); // Update F if new score is higher
+            temp2.leftShift(1);    // Shift temp register by one
+            temp2.subtractLit(u);  // Subtract gap extension penalty
+            F.maxVector(F, temp2); // Update F is score is higher after subtraction
 
             for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++){
               if (temp2(vInd) > 0)
@@ -337,20 +343,20 @@ public class SmithWatermanParVect {
             }
           }
 
-          tempH.maxVector(tempH, F); //Update H if vertical gap is better
-          F.addLit(v);               // Update F for use in next round
-          F.maxVector(F, tempH);     // Update F for use in next round
+          tempH.maxVector(tempH, F); //Find highest value between vertical and upper diagonal cells
+          F.addLit(v); // Add gap opening penalty to F
+          F.maxVector(F, tempH); //Check if H or F is higher for all elements
         }
         else{
-          F.copy(tempH); // Update F for use in next round
+          F.copy(tempH); //Otherwise update F for use in next round
         }
 
-        tempH.maxVector(tempH, zeroVect); //Maybe this statement is actually not supposed to be here :O
+        tempH.maxVector(tempH, zeroVect); //Find hihgest value between H and zero
 
 
-        HH(i).copy(tempH);                       // Store H-vector in HH-array
-        EE(i).maxVector(tempH - gapOpen, tempE); // Store E-vector in EE-array
-        EE(i).subtractLit(u);                    // Store E-vector in EE-array
+        HH(i).copy(tempH);                       // Copy tempH value for next column
+        EE(i).maxVector(tempH - gapOpen, tempE); // Find highest value between tempH and horizontal value
+        EE(i).subtractLit(u);                    // Subtract gap extension
 
         // Save elements in H-matrix
         for (vInd in 0..7) {
@@ -363,7 +369,7 @@ public class SmithWatermanParVect {
 
         // Update maxH cell if score of this cell exceeds that of maxH.
         if (max.second > maxH.score){
-          maxH = new Cell(max.second, i*VECTOR_SIZE+max.first+1, j+1);
+          maxH = new Cell(max.second, i*VECTOR_SIZE+max.first, j);
         }
       }
     }
