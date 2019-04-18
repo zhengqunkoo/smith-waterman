@@ -133,7 +133,7 @@ class Vector {
     VECTOR_SIZE, (i:Long) => this.v(i) + vect.v(i)
   ));
 
-  //Element-wise copy all elements of @vec to this 
+  //Element-wise copy all elements of @vec to this
   // Used instead of assignment operator
   public def copy(vec: Vector) {
     for (var p: Long = 0; p < VECTOR_SIZE; p++)
@@ -255,15 +255,15 @@ public class SmithWatermanParVect {
     //Initialize temporary varibles for algorithm
     var currentChar:Char;                //One database sequence symbol (c)
     val vectorCount = (n / VECTOR_SIZE);  //Vectors (H, X, E, F, T1, T2) and Array (HH, EE)
-    var tempH: Vector = new Vector(0);   
-    var tempE: Vector = new Vector(0);   
-    var temp1: Vector = new Vector(0);    
-    var temp2: Vector = new Vector(0);   
-    var F: Vector = new Vector(0);       
-    var tempF: Vector = new Vector(0);    
-    var X: Vector = new Vector(0);       
-    var zeroVect: Vector = new Vector(0); 
-    var score: Vector = new Vector(0);   
+    var tempH: Vector = new Vector(0);
+    var tempE: Vector = new Vector(0);
+    var temp1: Vector = new Vector(0);
+    var temp2: Vector = new Vector(0);
+    var F: Vector = new Vector(0);
+    var tempF: Vector = new Vector(0);
+    var X: Vector = new Vector(0);
+    var zeroVect: Vector = new Vector(0);
+    var score: Vector = new Vector(0);
 
     //Default vectors containing gap penalty variables
     var gapOpen: Vector = new Vector(v);  //Gap open penalty vector (Vector.subtractLit(v) is used instead)
