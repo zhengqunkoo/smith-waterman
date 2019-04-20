@@ -231,7 +231,7 @@ public class SmithWatermanParVect {
   var u:Long; // Gap extension penalty
   var v:Long; // Gap opening penalty
   var alphabet:String; // Amino acids
-  var H:Array_2[Cell]{self!=null};
+  var H:Array_2[Long]{self!=null};
   var HH:Rail[Vector];
   var EE:Rail[Vector];
   var S:Array_2[Int]{self!=null};
@@ -247,7 +247,7 @@ public class SmithWatermanParVect {
     val vectorCount = n / VECTOR_SIZE;
     EE = new Rail[Vector](vectorCount+1);
     HH = new Rail[Vector](vectorCount+1);
-    H = new Array_2[Cell](n+1, m+1);
+    H = new Array_2[Long](n+1, m+1);
 
   }
 
@@ -362,7 +362,7 @@ public class SmithWatermanParVect {
         // Save elements in H-matrix
         for (vInd in 0..7) {
           val row: Long = i*VECTOR_SIZE+vInd;
-          H(row+1, j+1) = new Cell(tempH(vInd), j+1, row+1);
+          H(row+1, j+1) = tempH(vInd);
         }
 
         //Find highest value found so far
@@ -386,7 +386,7 @@ public class SmithWatermanParVect {
   //Public constructor, zero initialize variables
   public def this() {
     S = new Array_2[Int](0, 0);
-    H = new Array_2[Cell](0, 0);
+    H = new Array_2[Long](0, 0);
     maxH = Cell(0, 0, 0);
   }
 
@@ -394,7 +394,7 @@ public class SmithWatermanParVect {
   def printH() {
     for (i in 0..n) {
       for (j in 0..m) {
-        Console.OUT.printf("(%d)", H(i, j).score);
+        Console.OUT.printf("(%d)", H(i, j));
       }
       Console.OUT.println();
     }
@@ -558,7 +558,7 @@ public class SmithWatermanParVect {
     val cell = H(i, j);
 
     // Stop if score of current cell is zero.
-    if (cell.score == 0) {
+    if (cell == 0) {
       return pair;
     }
 
@@ -569,7 +569,7 @@ public class SmithWatermanParVect {
     // Get coordinates of largest scoirng neighbor in new temp variables.
     var k: Long = i-1;
     var l: Long = j-1;
-    val maxInd = maxThree(c1.score, c2.score, c3.score);
+    val maxInd = maxThree(c1, c2, c3);
     if (maxInd == 1)
     {
       l = j;
