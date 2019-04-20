@@ -222,6 +222,7 @@ class Vector {
  */
 public class SmithWatermanParVect {
 
+  val ILLEGAL_CHAR = '0';
   val VECTOR_SIZE = 8;
   var n:Long; // Length of a
   var m:Long; // Length of b
@@ -414,34 +415,35 @@ public class SmithWatermanParVect {
   def parseSWithPadding(fr:FileReader) {
     Console.OUT.println("LENGTH OF ALPHABET = " + alphabet.length());
 
-    S = new Array_2[Int](alphabet.length() + 1, alphabet.length() + 1);
+    // Pad data if a-sequence does not scale with vector size
+    var padding:Long = (a.length() % VECTOR_SIZE);
+    if (padding != 0) {
+      padding = 8 - padding;
+    }
+    for (i in 1..padding) {
+      a = a + ILLEGAL_CHAR;
+    }
+    S = new Array_2[Int](alphabet.length() + padding, alphabet.length() +
+      padding);
     val ip = new IntParser(fr);
     for (i in 0..(alphabet.length()-1)) {
       for (j in 0..(alphabet.length()-1)) {
         S(i, j) = ip.next();
       }
     }
-    var padding:Long = (a.length() % VECTOR_SIZE); //Pad data if a-sequence
-                                                   // Does not scale with vector size
-    if (padding != 0)
+
+    // Add large negative value to padding character in substitution matrix
+    // To avoid padding characters affecting alignment result
+    for (i in 0..(alphabet.length() + padding -1))
     {
-      alphabet = alphabet + "0";
-
-      for (i in 0..padding){
-        a = a + '0';
-      }
-
-      // Add large negative value to padding character in substitution matrix
-      // To avoid padding characters affecting alignment result
-      for (i in 0..(alphabet.length() -1))
+      for (j in (alphabet.length())..(alphabet.length() + padding -1))
       {
-        S(alphabet.length()-1, i) = -2000n;
-        S(i, alphabet.length()-1) = -2000n;
+        S(j, i) = -2000n;
+        S(i, j) = -2000n;
       }
-
-      n = a.length();
     }
 
+    n = a.length();
 
     Console.OUT.println("Length of n: " + n);
   }
