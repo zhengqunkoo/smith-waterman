@@ -288,7 +288,9 @@ public class SmithWatermanParVect {
 
         temp1(0) = tempH(7);// Save previous H[7] for use below
         tempH.leftShift(1); // Shift H-vector and OR with H[7] from previous round
+        if (X(0) != 0) {
         tempH(0) = X(0);    // Shift H-vector and OR with H[7] from previous round
+        }
         X(0) = temp1(0);    //save old H[7] in X for next round
 
         // Add score profile vector to H (and subtract base)
@@ -305,7 +307,9 @@ public class SmithWatermanParVect {
         tempF.copy(F);      // Calculate initial F-vector by shifting H and previous F
         F.copy(tempH);      // Calculate initial F-vector by shifting H and previous F
         F.leftShift(1);     // Calculate initial F-vector by shifting H and previous F
+        if (tempF(7) != 0) {
         F(0) = tempF(7);    // Calculate initial F-vector by shifting H and previous F
+        }
         F.subtractLit(u+v); //Subtract single gap penalty
 
         //Check if vertical gaps are possible
