@@ -244,7 +244,7 @@ public class SmithWatermanParVect {
 
   // Initialize cells of the H matrix.
   def initH() {
-    val vectorCount = n / VECTOR_SIZE + 1;
+    val vectorCount = n / VECTOR_SIZE;
     EE = new Rail[Vector](vectorCount+1);
     HH = new Rail[Vector](vectorCount+1);
     H = new Array_2[Cell](n+1, m+1);
@@ -297,10 +297,11 @@ public class SmithWatermanParVect {
         // Add score profile vector to H (and subtract base)
         for(var vInd: Long = 0; vInd < VECTOR_SIZE; vInd++)
         {
-          tempH(vInd) = (tempH(vInd) +
-          S(alphabet.indexOf(a.charAt((i*VECTOR_SIZE+vInd) as Int)),
-            alphabet.indexOf(currentChar)
-          ));
+          val aChar = a.charAt((i*VECTOR_SIZE+vInd) as Int);
+          if (aChar != ILLEGAL_CHAR) {
+            tempH(vInd) = tempH(vInd) + S(alphabet.indexOf(aChar),
+              alphabet.indexOf(currentChar));
+          }
         }
 
         tempH.maxVector(tempH, tempE); //Check if score with database gap is better
