@@ -304,6 +304,7 @@ public class SmithWatermanParVect {
 
         tempF.copy(F);      // Calculate initial F-vector by shifting H and previous F
         F.copy(tempH);      // Calculate initial F-vector by shifting H and previous F
+        F.leftShift(1);     // Calculate initial F-vector by shifting H and previous F
         F(0) = tempF(7);    // Calculate initial F-vector by shifting H and previous F
         F.subtractLit(u+v); //Subtract single gap penalty
 
