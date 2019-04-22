@@ -5,6 +5,22 @@ In the x10 language, for the National University of Singapore's CS3211 module.
 This is the master branch.
 
 ## Usage
+### Download x10
+- Get the latest version from [SourceForge].
+
+### Set up Paths
+- Add these to your `~/.bashrc`.
+  ```
+  export PATH=$PATH:"path/to/x10-2.6.2_linux_x86_64/bin/"
+  ```
+
+### Set up Files
+```
+git clone https://github.com/zhengqunkoo/smith-waterman
+cd smith-waterman
+```
+
+### Compile and Run
 - To avoid badly formatted stdout, redirect to file.
   ```
   x10c++ SmithWaterman.x10 \
@@ -28,4 +44,5 @@ This is the master branch.
   && cat out
   ```
 
+[SourceForge]: https://sourceforge.net/projects/x10/files/latest/download
 [Wikipedia's gap example]: https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm#Gap_penalty_example
