@@ -28,7 +28,4 @@ This is the master branch.
   && cat out
   ```
 
-## Roadmap
-1. Implement sequential algorithm.
-
 [Wikipedia's gap example]: https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm#Gap_penalty_example
